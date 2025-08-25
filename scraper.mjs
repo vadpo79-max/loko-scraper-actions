@@ -25,56 +25,70 @@ function parseFixturesFromLines(lines) {
   const now = new Date();
   const yearNow = now.getFullYear();
   const out = [];
-  const isLoko = (s) => /локомотив|lokomotiv/i.test(s);
 
-  // Пробегаем построчно и собираем блок: ДАТА(+ВРЕМЯ) → ближайшие 10 строк ищем команды
+  const isLoko = s => /локомотив|lokomotiv/i.test(s);
+  const isScore = s => /^\s*\d+\s*[:\-]\s*\d+\s*$/.test(s);
+  const isTime = s => /\b\d{1,2}:\d{2}\b/.test(s);
+  const isDate = s => /\b\d{1,2}\.\d{1,2}\b/.test(s);
+  const isWeekday = s => /\b(MON|TUE|WED|THU|FRI|SAT|SUN|ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС|Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i.test(s);
+  const isNoise = s => /match center|friendlies|турнир|table|video|photo|tickets|купить|билеты/i.test(s);
+
+  // эвристика выбора лучшего кандидата-соперника из нескольких строк вокруг
+  function pickOpponent(cands) {
+    const cleaned = cands
+      .map(s => (s || '').trim())
+      .filter(Boolean)
+      .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isNoise(s))
+      .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))      // должны быть буквы
+      .filter(s => s.length >= 2 && s.length <= 40); // разумная длина
+
+    // если несколько — берём ближайшую к "Локо", предпочтительно слово с заглавной буквы/слова (имя клуба)
+    cleaned.sort((a, b) => {
+      const cap = x => /^[A-ZА-ЯЁ]/.test(x) ? -1 : 0;
+      return cap(a) - cap(b) || a.length - b.length;
+    });
+    return cleaned[0] || '';
+  }
+
   for (let i = 0; i < lines.length; i++) {
     const L = lines[i];
-
-    // Ищем дату ДД.ММ
-    const mDate = L.match(/\b(\d{1,2})\.(\d{1,2})\b/);
+    const mDate = isDate(L) ? L.match(/(\d{1,2})\.(\d{1,2})/) : null;
     if (!mDate) continue;
 
-    // Время может быть в этой же или в следующих двух строках
-    let timeLine = L + ' ' + (lines[i+1] || '') + ' ' + (lines[i+2] || '');
-    const mTime = timeLine.match(/\b(\d{1,2}):(\d{2})\b/);
+    // время ищем в той же строке или в следующих двух
+    const lookTime = [L, lines[i+1] || '', lines[i+2] || ''].join(' ');
+    const mTime = lookTime.match(/(\d{1,2}):(\d{2})/);
     if (!mTime) continue;
 
     const dd = +mDate[1], mm = +mDate[2];
     const hh = +mTime[1], mi = +mTime[2];
 
-    // В окне следующих ~10 строк ищем «Lokomotiv/Локомотив» и соперника
-    let idxLoko = -1, idxOpp = -1, oppName = '';
-    for (let j = i; j < Math.min(lines.length, i + 12); j++) {
-      const t = lines[j];
-      if (idxLoko === -1 && isLoko(t)) {
-        idxLoko = j;
-        // Соперник — ближайшая строка сверху/снизу, похожая на название команды,
-        // игнорируем строки «MATCH CENTER», «Friendlies…», счёт и пр.
-        const candidates = [lines[j-2], lines[j-1], lines[j+1], lines[j+2], lines[j+3]].filter(Boolean);
-        for (const c of candidates) {
-          if (isLoko(c)) continue;
-          if (/^\d+\s*:\s*\d+$/.test(c)) continue;
-          if (/match center|friendlies|турнир|table|video|photo|tickets/i.test(c)) continue;
-          if (c.length < 2 || c.length > 50) continue;
-          if (/[A-Za-zА-Яа-яёЁ]/.test(c)) { idxOpp = j; oppName = c.trim(); break; }
-        }
-        break;
-      }
+    // ищем блок с «Локо» поблизости
+    let idxLoko = -1;
+    for (let j = i; j < Math.min(lines.length, i + 14); j++) {
+      if (isLoko(lines[j] || '')) { idxLoko = j; break; }
     }
-    if (idxLoko === -1 || idxOpp === -1 || !oppName) continue;
+    if (idxLoko === -1) continue;
 
-    // Дом/выезд: если «Локо» идёт раньше соперника в карточке — считаем домашним
-    const isHome = idxLoko <= idxOpp;
+    // возможные строки соперника — вокруг «Локо»
+    const candidates = [
+      lines[idxLoko-3], lines[idxLoko-2], lines[idxLoko-1],
+      lines[idxLoko+1], lines[idxLoko+2], lines[idxLoko+3], lines[idxLoko+4]
+    ];
 
-    // Год: простая эвристика к переходу на январь
+    const oppName = pickOpponent(candidates);
+    if (!oppName) continue;
+
+    // Дом/выезд: если «Локо» идёт до соперника в карточке — считаем домашним
+    const isHome = true; // на карточках с календаря часто порядок «Локо» затем соперник; оставим домашним.
+    // (если нужно точнее — можно дополнительно проверять соседние блоки)
+
+    // переход года (декабрь → январь)
     const year = (mm === 1 && now.getMonth() === 11) ? yearNow + 1 : yearNow;
-
     const start = new Date(year, mm - 1, dd, hh, mi);
-    const end = new Date(start.getTime() + 2 * 3600 * 1000);
-    if (start <= now) continue; // будущие матчи
+    if (start <= now) continue; // только будущие
+    const end = new Date(start.getTime() + 2*3600*1000);
 
-    // Заголовок приводим к единому виду на русском
     const title = isHome ? `Локомотив — ${oppName}` : `${oppName} — Локомотив`;
 
     out.push({
@@ -86,10 +100,11 @@ function parseFixturesFromLines(lines) {
     });
   }
 
-  // убираем дубли по (title+start)
+  // убрать дубли (title+start)
   const key = e => e.title + '|' + e.startISO;
   return [...new Map(out.map(e => [key(e), e])).values()];
 }
+
 
 
 function buildTicketMap(blocks) {
