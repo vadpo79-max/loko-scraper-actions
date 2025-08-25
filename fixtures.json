@@ -1,79 +1,79 @@
 {
-  "generatedAt": "2025-08-25T17:46:32.408Z",
+  "generatedAt": "2025-08-25T18:09:00.324Z",
   "count": 11,
   "fixtures": [
     {
-      "title": "Локомотив — 19:30 THU",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-08-28T19:30:00.000Z",
       "endISO": "2025-08-28T21:30:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — 15:45 SUN",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-08-31T15:45:00.000Z",
       "endISO": "2025-08-31T17:45:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — Akhmat",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-09-13T16:45:00.000Z",
       "endISO": "2025-09-13T18:45:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — Akron",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-09-16T18:45:00.000Z",
       "endISO": "2025-09-16T20:45:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — Dinamo",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-09-20T19:30:00.000Z",
       "endISO": "2025-09-20T21:30:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — 16:30 SAT",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-09-27T16:30:00.000Z",
       "endISO": "2025-09-27T18:30:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — 20:30 WED",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-10-01T20:30:00.000Z",
       "endISO": "2025-10-01T22:30:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — Dynamo",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-10-04T19:45:00.000Z",
       "endISO": "2025-10-04T21:45:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — 19:45 SAT",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-10-18T19:45:00.000Z",
       "endISO": "2025-10-18T21:45:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — Baltika",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-10-23T21:00:00.000Z",
       "endISO": "2025-10-23T23:00:00.000Z",
       "location": "РЖД Арена, Москва"
     },
     {
-      "title": "Локомотив — Akron",
+      "title": "Локомотив — VS",
       "isHome": true,
       "startISO": "2025-10-26T13:00:00.000Z",
       "endISO": "2025-10-26T15:00:00.000Z",
