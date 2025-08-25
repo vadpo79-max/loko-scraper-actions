@@ -1,0 +1,10 @@
+{
+  "name": "loko-scraper-actions",
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.46.0"
+  },
+  "scripts": {
+    "start": "node scraper.mjs"
+  }
+}
