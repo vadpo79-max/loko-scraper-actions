@@ -3,14 +3,24 @@ import puppeteer from "puppeteer";
 
 const CANDIDATE_SCHEDULE_URLS = [
   "https://www.fclm.ru/schedule/",
-  "https://www.fclm.ru/en/schedule/",
-  "https://www.fclm.ru/schedule/?print=Y",
-  "https://www.fclm.ru/en/schedule/?print=Y"
-];
+  "https://www.fclm.ru/schedule/?print=Y"
+]; // только RU-страницы
+
 const TICKETS_URLS = [
-  "https://www.fclm.ru/tickets/",
-  "https://www.fclm.ru/en/tickets/schedule/"
+  "https://www.fclm.ru/tickets/"
 ];
+
+// словарь англ → рус для соперников
+const EN_RU = new Map(Object.entries({
+  "Akhmat":"Ахмат", "Akron":"Акрон", "Dinamo":"Динамо", "Dynamo":"Динамо",
+  "Baltika":"Балтика", "Zenit":"Зенит", "CSKA":"ЦСКА", "Krasnodar":"Краснодар",
+  "Spartak":"Спартак", "Rubin":"Рубин", "Orenburg":"Оренбург", "Ural":"Урал",
+  "Sochi":"Сочи", "Rostov":"Ростов", "Fakel":"Факел", "Khimki":"Химки",
+  "Torpedo":"Торпедо", "Krylia Sovetov":"Крылья Советов", "Pari NN":"Пари НН",
+  "Nizhny Novgorod":"Нижний Новгород", "Lokomotiv":"Локомотив"
+}));
+const toRu = (name) => EN_RU.get((name||"").trim()) || name;
+
 
 // --- utils ---
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -30,16 +40,17 @@ function parseFixturesFromLines(lines) {
   const isScore   = s => /^\s*\d+\s*[:\-]\s*\d+\s*$/.test(s || '');
   const isTime    = s => /\b\d{1,2}:\d{2}\b/.test(s || '');
   const isDate    = s => /\b\d{1,2}\.\d{1,2}\b/.test(s || '');
-  const isWeekday = s => /\b(MON|TUE|WED|THU|FRI|SAT|SUN|ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)\b/i.test(s || '');
-  const isMonth   = s => /\b(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER|ЯНВАРЬ|ФЕВРАЛЬ|МАРТ|АПРЕЛЬ|МАЙ|ИЮНЬ|ИЮЛЬ|АВГУСТ|СЕНТЯБРЬ|ОКТЯБРЬ|НОЯБРЬ|ДЕКАБРЬ)\b/i.test(s || '');
-  const isNoise   = s => /match center|friendlies|турнир|table|video|photo|tickets|купить|билеты|реклама/i.test(s || '');
+  const isWeekday = s => /\b(ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС|MON|TUE|WED|THU|FRI|SAT|SUN)\b/i.test(s || '');
+  const isMonth   = s => /\b(ЯНВАРЬ|ФЕВРАЛЬ|МАРТ|АПРЕЛЬ|МАЙ|ИЮНЬ|ИЮЛЬ|АВГУСТ|СЕНТЯБРЬ|ОКТЯБРЬ|НОЯБРЬ|ДЕКАБРЬ|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\b/i.test(s || '');
   const isVS      = s => /^\s*vs\s*$/i.test(s || '');
+  const isTournament = s => /(rpl|premier|match ?day|day\s*\d+|friendlies|товарищ|кубок|тур|этап|группа|плей-офф|round|group|stage)/i.test(s || '');
+  const isNoise   = s => /match center|table|video|photo|tickets|купить|билеты|реклама/i.test(s || '');
 
   function pickOpponent(around) {
     const cleaned = around
       .map(s => (s || '').trim())
       .filter(Boolean)
-      .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isMonth(s) && !isNoise(s) && !isVS(s))
+      .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isMonth(s) && !isVS(s) && !isTournament(s) && !isNoise(s))
       .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))
       .filter(s => s.length >= 2 && s.length <= 40);
 
@@ -54,7 +65,6 @@ function parseFixturesFromLines(lines) {
     const L = lines[i];
     if (!isDate(L)) continue;
 
-    // время может быть рядом
     const lookTime = [L, lines[i+1] || '', lines[i+2] || ''].join(' ');
     const mTime = lookTime.match(/(\d{1,2}):(\d{2})/);
     if (!mTime) continue;
@@ -63,45 +73,45 @@ function parseFixturesFromLines(lines) {
     const dd = +mDate[1], mm = +mDate[2];
     const hh = +mTime[1], mi = +mTime[2];
 
-    // окно с карточкой матча
+    // окно карточки
     const W_START = i;
-    const W_END = Math.min(lines.length, i + 16);
+    const W_END = Math.min(lines.length, i + 18);
 
-    // индекс строки с Локо
+    // где «Локо»
     let idxLoko = -1;
     for (let j = W_START; j < W_END; j++) {
       if (isLoko(lines[j])) { idxLoko = j; break; }
     }
     if (idxLoko === -1) continue;
 
-    // ищем «VS» рядом
+    // где «VS»
     let idxVS = -1;
-    for (let j = idxLoko - 3; j <= idxLoko + 3; j++) {
+    for (let j = idxLoko - 4; j <= idxLoko + 4; j++) {
       if (j >= W_START && j < W_END && isVS(lines[j])) { idxVS = j; break; }
     }
 
-    // кандидаты на соперника вокруг Локо
+    // кандидаты соперника вокруг «Локо»
     const around = [
       lines[idxLoko-4], lines[idxLoko-3], lines[idxLoko-2], lines[idxLoko-1],
       lines[idxLoko+1], lines[idxLoko+2], lines[idxLoko+3], lines[idxLoko+4]
     ];
-    const opp = pickOpponent(around);
+    let opp = pickOpponent(around);
     if (!opp) continue;
 
-    // определяем «дом/выезд»
+    // перевод на русское название при необходимости
+    opp = toRu(opp);
+
+    // дом/выезд
     let isHome = true;
     if (idxVS !== -1) {
-      // "A VS B": если Локо перед VS — домашний, после — выезд
-      isHome = idxLoko < idxVS;
+      isHome = idxLoko < idxVS;          // «Локо» слева от VS → дом
     } else {
-      // без "VS" — по относительной позиции соперника
-      const posOpp = around.findIndex(s => s && s.trim() === opp);
-      // если соперник найден «ниже» — считаем домашним
-      isHome = posOpp >= 4 || posOpp === -1;
+      const posOpp = around.findIndex(s => (s || '').trim() === opp);
+      isHome = !(posOpp >= 0 && posOpp <= 2); // если соперник «выше», считаем выезд
     }
 
-    // переход года
-    const year = (mm === 1 && now.getMonth() === 11) ? yearNow + 1 : yearNow;
+    // год
+    const year = (mm === 1 && new Date().getMonth() === 11) ? yearNow + 1 : yearNow;
     const start = new Date(year, mm - 1, dd, hh, mi);
     if (start <= now) continue;
     const end = new Date(start.getTime() + 2*3600*1000);
@@ -118,6 +128,7 @@ function parseFixturesFromLines(lines) {
   const key = e => e.title + '|' + e.startISO;
   return [...new Map(out.map(e => [key(e), e])).values()];
 }
+
 
 
 
@@ -214,7 +225,7 @@ async function run() {
     await fs.writeFile("debug-schedule.txt",
       `NO LINES FOUND from:\n${CANDIDATE_SCHEDULE_URLS.join("\n")}\n\nHTML SAMPLE:\n${htmlSample}\n`, "utf8");
   } else {
-    await fs.writeFile("debug-schedule.txt", `USED: ${usedScheduleUrl}\n---\n${scheduleLines.slice(0,80).join("\n")}\n`, "utf8");
+    await fs.writeFile("debug-schedule.txt", `USED: ${usedScheduleUrl}\n---\n${scheduleLines.slice(0,400).join("\n")}\n`, "utf8");
   }
 
   // --- билеты ---
