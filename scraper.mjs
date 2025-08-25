@@ -34,21 +34,23 @@ function parseFixturesFromLines(lines) {
   const isNoise = s => /match center|friendlies|турнир|table|video|photo|tickets|купить|билеты/i.test(s);
 
   // эвристика выбора лучшего кандидата-соперника из нескольких строк вокруг
-  function pickOpponent(cands) {
+    function pickOpponent(cands) {
     const cleaned = cands
       .map(s => (s || '').trim())
       .filter(Boolean)
       .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isNoise(s))
-      .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))      // должны быть буквы
-      .filter(s => s.length >= 2 && s.length <= 40); // разумная длина
+      .filter(s => !/^vs$/i.test(s))              // <<< игнорируем строки "VS"
+      .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))    // должны быть буквы
+      .filter(s => s.length >= 2 && s.length <= 40);
 
-    // если несколько — берём ближайшую к "Локо", предпочтительно слово с заглавной буквы/слова (имя клуба)
+    // если несколько кандидатов — берём более "правдоподобный" (с заглавной буквы)
     cleaned.sort((a, b) => {
       const cap = x => /^[A-ZА-ЯЁ]/.test(x) ? -1 : 0;
       return cap(a) - cap(b) || a.length - b.length;
     });
     return cleaned[0] || '';
   }
+
 
   for (let i = 0; i < lines.length; i++) {
     const L = lines[i];
