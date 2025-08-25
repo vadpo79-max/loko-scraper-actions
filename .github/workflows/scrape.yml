@@ -1,7 +1,7 @@
 name: Scrape Loko Fixtures
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch: 
   schedule:
     - cron: "0 6 * * 5"  # каждую пятницу 06:00 UTC (~ 09:00 по Хельсинки)
 
