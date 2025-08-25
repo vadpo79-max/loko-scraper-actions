@@ -62,14 +62,25 @@ function parseFixturesFromLines(lines) {
       .map(s => (s || '').trim())
       .filter(Boolean)
       .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isMonth(s) && !isVS(s) && !isTournament(s) && !isNoise(s))
+      .filter(s => !/^\d{4}$/.test(s))                   // год ("2025")
+      .filter(s => !/^(ЯНВАРЬ|ФЕВРАЛЬ|МАРТ|АПРЕЛЬ|МАЙ|ИЮНЬ|ИЮЛЬ|АВГУСТ|СЕНТЯБРЬ|ОКТЯБРЬ|НОЯБРЬ|ДЕКАБРЬ)$/i.test(s)) // отдельная строка-месяц
       .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))
       .filter(s => s.length >= 2 && s.length <= 40);
+
+    // если есть несколько — отдаём предпочтение строке с пробелом (обычно названия команд из 2 слов)
     cleaned.sort((a, b) => {
-      const cap = x => /^[A-ZА-ЯЁ]/.test(x) ? -1 : 0;
-      return cap(a) - cap(b) || a.length - b.length;
+      const score = (x) => {
+        let sc = 0;
+        if (/^[A-ZА-ЯЁ]/.test(x)) sc -= 1;  // заглавная буква — приоритет
+        if (/\s/.test(x)) sc -= 1;          // есть пробел — приоритет ("Крылья Советов")
+        return sc;
+      };
+      return score(a) - score(b) || a.length - b.length;
     });
+
     return cleaned[0] || '';
   }
+
 
   function extractCompetition(windowLines) {
     // ищем строку турнира в окне карточки
