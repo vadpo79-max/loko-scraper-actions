@@ -147,16 +147,17 @@ function parseFixturesFromLines(lines) {
     const { competition, round } = extractCompetition(windowLines);
 
     // год и время
+    const MSK_OFFSET_HOURS = 3;
     const year = (mm === 1 && new Date().getMonth() === 11) ? yearNow + 1 : yearNow;
-    const start = new Date(year, mm - 1, dd, hh, mi);
+    const startUTC = new Date(Date.UTC(year, mm - 1, dd, hh - MSK_OFFSET_HOURS, mi));
     if (start <= now) continue;
-    const end = new Date(start.getTime() + 2 * 3600 * 1000);
+    const endUTC   = new Date(startUTC.getTime() + 2 * 3600 * 1000);
 
     out.push({
       title: isHome ? `Локомотив — ${opp}` : `${opp} — Локомотив`,
       isHome,
-      startISO: start.toISOString(),
-      endISO: end.toISOString(),
+      startISO: startUTC.toISOString(),   // напр. 16:30Z для 19:30 MSK
+      endISO: endUTC.toISOString(),
       location: isHome ? "РЖД Арена, Москва" : "",
       competition: competition,   // например: "Россия. Премьер-лига"
       round: round                // например: "Тур 7" или "Групповой этап. Тур 3"
