@@ -149,18 +149,21 @@ function parseFixturesFromLines(lines) {
     // год и время
     const MSK_OFFSET_HOURS = 3;
     const year = (mm === 1 && new Date().getMonth() === 11) ? yearNow + 1 : yearNow;
-    const startUTC = new Date(Date.UTC(year, mm - 1, dd, hh - MSK_OFFSET_HOURS, mi));
-    if (start <= now) continue;
-    const endUTC   = new Date(startUTC.getTime() + 2 * 3600 * 1000);
+    const startUTC = new Date(Date.UTC(year, mm - 1, dd, hh - MSK_OFFSET, mi));
+    const endUTC   = new Date(Date.UTC(year, mm - 1, dd, hh - MSK_OFFSET, mi + 120)); // +2 часа
 
+    // пропускаем прошедшие матчи
+    if (startUTC.getTime() <= Date.now()) continue;
+
+    // добавляем событие
     out.push({
       title: isHome ? `Локомотив — ${opp}` : `${opp} — Локомотив`,
       isHome,
-      startISO: startUTC.toISOString(),   // напр. 16:30Z для 19:30 MSK
+      startISO: startUTC.toISOString(),
       endISO: endUTC.toISOString(),
       location: isHome ? "РЖД Арена, Москва" : "",
-      competition: competition,   // например: "Россия. Премьер-лига"
-      round: round                // например: "Тур 7" или "Групповой этап. Тур 3"
+      competition,
+      round
     });
   }
 
