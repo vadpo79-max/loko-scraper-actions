@@ -26,24 +26,23 @@ function parseFixturesFromLines(lines) {
   const yearNow = now.getFullYear();
   const out = [];
 
-  const isLoko = s => /локомотив|lokomotiv/i.test(s);
-  const isScore = s => /^\s*\d+\s*[:\-]\s*\d+\s*$/.test(s);
-  const isTime = s => /\b\d{1,2}:\d{2}\b/.test(s);
-  const isDate = s => /\b\d{1,2}\.\d{1,2}\b/.test(s);
-  const isWeekday = s => /\b(MON|TUE|WED|THU|FRI|SAT|SUN|ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС|Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i.test(s);
-  const isNoise = s => /match center|friendlies|турнир|table|video|photo|tickets|купить|билеты/i.test(s);
+  const isLoko    = s => /локомотив|lokomotiv/i.test(s || '');
+  const isScore   = s => /^\s*\d+\s*[:\-]\s*\d+\s*$/.test(s || '');
+  const isTime    = s => /\b\d{1,2}:\d{2}\b/.test(s || '');
+  const isDate    = s => /\b\d{1,2}\.\d{1,2}\b/.test(s || '');
+  const isWeekday = s => /\b(MON|TUE|WED|THU|FRI|SAT|SUN|ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)\b/i.test(s || '');
+  const isMonth   = s => /\b(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER|ЯНВАРЬ|ФЕВРАЛЬ|МАРТ|АПРЕЛЬ|МАЙ|ИЮНЬ|ИЮЛЬ|АВГУСТ|СЕНТЯБРЬ|ОКТЯБРЬ|НОЯБРЬ|ДЕКАБРЬ)\b/i.test(s || '');
+  const isNoise   = s => /match center|friendlies|турнир|table|video|photo|tickets|купить|билеты|реклама/i.test(s || '');
+  const isVS      = s => /^\s*vs\s*$/i.test(s || '');
 
-  // эвристика выбора лучшего кандидата-соперника из нескольких строк вокруг
-    function pickOpponent(cands) {
-    const cleaned = cands
+  function pickOpponent(around) {
+    const cleaned = around
       .map(s => (s || '').trim())
       .filter(Boolean)
-      .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isNoise(s))
-      .filter(s => !/^vs$/i.test(s))              // <<< игнорируем строки "VS"
-      .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))    // должны быть буквы
+      .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isMonth(s) && !isNoise(s) && !isVS(s))
+      .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))
       .filter(s => s.length >= 2 && s.length <= 40);
 
-    // если несколько кандидатов — берём более "правдоподобный" (с заглавной буквы)
     cleaned.sort((a, b) => {
       const cap = x => /^[A-ZА-ЯЁ]/.test(x) ? -1 : 0;
       return cap(a) - cap(b) || a.length - b.length;
@@ -51,50 +50,64 @@ function parseFixturesFromLines(lines) {
     return cleaned[0] || '';
   }
 
-
   for (let i = 0; i < lines.length; i++) {
     const L = lines[i];
-    const mDate = isDate(L) ? L.match(/(\d{1,2})\.(\d{1,2})/) : null;
-    if (!mDate) continue;
+    if (!isDate(L)) continue;
 
-    // время ищем в той же строке или в следующих двух
+    // время может быть рядом
     const lookTime = [L, lines[i+1] || '', lines[i+2] || ''].join(' ');
     const mTime = lookTime.match(/(\d{1,2}):(\d{2})/);
     if (!mTime) continue;
 
+    const mDate = L.match(/(\d{1,2})\.(\d{1,2})/);
     const dd = +mDate[1], mm = +mDate[2];
     const hh = +mTime[1], mi = +mTime[2];
 
-    // ищем блок с «Локо» поблизости
+    // окно с карточкой матча
+    const W_START = i;
+    const W_END = Math.min(lines.length, i + 16);
+
+    // индекс строки с Локо
     let idxLoko = -1;
-    for (let j = i; j < Math.min(lines.length, i + 14); j++) {
-      if (isLoko(lines[j] || '')) { idxLoko = j; break; }
+    for (let j = W_START; j < W_END; j++) {
+      if (isLoko(lines[j])) { idxLoko = j; break; }
     }
     if (idxLoko === -1) continue;
 
-    // возможные строки соперника — вокруг «Локо»
-    const candidates = [
-      lines[idxLoko-3], lines[idxLoko-2], lines[idxLoko-1],
+    // ищем «VS» рядом
+    let idxVS = -1;
+    for (let j = idxLoko - 3; j <= idxLoko + 3; j++) {
+      if (j >= W_START && j < W_END && isVS(lines[j])) { idxVS = j; break; }
+    }
+
+    // кандидаты на соперника вокруг Локо
+    const around = [
+      lines[idxLoko-4], lines[idxLoko-3], lines[idxLoko-2], lines[idxLoko-1],
       lines[idxLoko+1], lines[idxLoko+2], lines[idxLoko+3], lines[idxLoko+4]
     ];
+    const opp = pickOpponent(around);
+    if (!opp) continue;
 
-    const oppName = pickOpponent(candidates);
-    if (!oppName) continue;
+    // определяем «дом/выезд»
+    let isHome = true;
+    if (idxVS !== -1) {
+      // "A VS B": если Локо перед VS — домашний, после — выезд
+      isHome = idxLoko < idxVS;
+    } else {
+      // без "VS" — по относительной позиции соперника
+      const posOpp = around.findIndex(s => s && s.trim() === opp);
+      // если соперник найден «ниже» — считаем домашним
+      isHome = posOpp >= 4 || posOpp === -1;
+    }
 
-    // Дом/выезд: если «Локо» идёт до соперника в карточке — считаем домашним
-    const isHome = true; // на карточках с календаря часто порядок «Локо» затем соперник; оставим домашним.
-    // (если нужно точнее — можно дополнительно проверять соседние блоки)
-
-    // переход года (декабрь → январь)
+    // переход года
     const year = (mm === 1 && now.getMonth() === 11) ? yearNow + 1 : yearNow;
     const start = new Date(year, mm - 1, dd, hh, mi);
-    if (start <= now) continue; // только будущие
+    if (start <= now) continue;
     const end = new Date(start.getTime() + 2*3600*1000);
 
-    const title = isHome ? `Локомотив — ${oppName}` : `${oppName} — Локомотив`;
-
     out.push({
-      title,
+      title: isHome ? `Локомотив — ${opp}` : `${opp} — Локомотив`,
       isHome,
       startISO: start.toISOString(),
       endISO: end.toISOString(),
@@ -102,10 +115,10 @@ function parseFixturesFromLines(lines) {
     });
   }
 
-  // убрать дубли (title+start)
   const key = e => e.title + '|' + e.startISO;
   return [...new Map(out.map(e => [key(e), e])).values()];
 }
+
 
 
 
