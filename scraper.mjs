@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { chromium } from "playwright";
+import puppeteer from "puppeteer";
 
 const CANDIDATE_SCHEDULE_URLS = [
   "https://www.fclm.ru/schedule/",
@@ -37,7 +37,6 @@ function parseFixturesFromLines(lines) {
     const isAway = /локомотив/i.test(B) && !/локомотив/i.test(A);
     if (!isHome && !isAway) continue;
 
-    // простая эвристика перехода через Новый год
     const year = (mm === 1 && now.getMonth() === 11) ? yearNow + 1 : yearNow;
 
     const start = new Date(year, mm - 1, dd, hh, mi);
@@ -90,123 +89,105 @@ async function gotoWithRetry(page, url) {
 
 async function acceptCookiesIfAny(page) {
   const candidates = [
-    'button:has-text("Согласен")',
-    'button:has-text("Принять")',
-    'button:has-text("Accept")',
-    '[data-accept="Y"]',
-    '.cookie-accept, .cookies-accept'
+    'button:contains("Согласен")',
+    'button:contains("Принять")',
+    'button:contains("Accept")',
   ];
   for (const sel of candidates) {
-    const btn = page.locator(sel);
-    if (await btn.first().isVisible().catch(()=>false)) {
-      await btn.first().click({ timeout: 2000 }).catch(()=>{});
-      await page.waitForTimeout(500);
-    }
+    const ok = await page.$eval('body', (body, s) => {
+      const el = [...body.querySelectorAll('button')].find(b => (b.innerText||'').includes(s));
+      if (el) { el.click(); return true; }
+      return false;
+    }, sel.replace(/^button:contains\(|\)$/g,'')).catch(()=>false);
+    if (ok) await page.waitForTimeout(500);
   }
 }
 
-async function waitForScheduleText(page) {
-  // ждём, пока в body появится дата и слово Локомотив
-  await page.waitForFunction(() => {
-    const t = (document.body.innerText || '').replace(/\s+/g,' ');
-    return /\d{1,2}\.\d{1,2}/.test(t) && /Локомотив/i.test(t);
-  }, { timeout: 20000 }).catch(()=>{});
-}
-
-async function grabLinesFrom(page) {
-  const txt = await page.locator("body").innerText().catch(()=>"");
-  return txt.split("\n").map(s => s.trim()).filter(Boolean);
+async function bodyLines(page) {
+  const txt = await page.evaluate(() => (document.body.innerText || ''));
+  return txt.split('\n').map(s => s.trim()).filter(Boolean);
 }
 
 async function run() {
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari",
-    locale: "ru-RU",
-    timezoneId: "Europe/Moscow",
-    viewport: { width: 1366, height: 900 }
+  const browser = await puppeteer.launch({
+    headless: "new",
+    args: ["--no-sandbox","--disable-setuid-sandbox"]
   });
-  await context.addInitScript(() => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-  });
-  // немного шумоподавления
-  await context.route(/\.(?:png|jpg|jpeg|gif|webp|svg|woff2?)$/i, r => r.abort());
-  await context.route(/googletagmanager|google-analytics|yandex|metric|facebook|vk\.com/i, r => r.abort());
 
+  // КАЛЕНДАРЬ
   let scheduleLines = [];
   let usedScheduleUrl = "";
-  let lastHtmlSample = "";
+  let htmlSample = "";
 
   for (const url of CANDIDATE_SCHEDULE_URLS) {
-    const page = await context.newPage();
+    const page = await browser.newPage();
+    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari");
+    await page.setExtraHTTPHeaders({ "Accept-Language": "ru,en;q=0.9" });
+
     if (await gotoWithRetry(page, url)) {
       await acceptCookiesIfAny(page);
       await page.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise(r=>setTimeout(r,1200)); });
-      await waitForScheduleText(page);
-      scheduleLines = await grabLinesFrom(page);
-      lastHtmlSample = (await page.content()).slice(0, 2000); // на случай полной пустоты
+
+      // ждём, пока в теле появится дата и «Локомотив»
+      await page.waitForFunction(() => {
+        const t = (document.body.innerText || '').replace(/\s+/g,' ');
+        return /\d{1,2}\.\d{1,2}/.test(t) && /Локомотив/i.test(t);
+      }, { timeout: 20000 }).catch(()=>{});
+
+      scheduleLines = await bodyLines(page);
+      htmlSample = (await page.content()).slice(0, 2000);
       const score = scheduleLines.filter(l => /\d{1,2}\.\d{1,2}/.test(l) && /Локомотив/i.test(l)).length;
       if (score > 0) { usedScheduleUrl = url; await page.close(); break; }
     }
     await page.close();
   }
 
-  // Диагностика
   if (!scheduleLines.length) {
     await fs.writeFile("debug-schedule.txt",
-      `NO LINES FOUND from:\n${CANDIDATE_SCHEDULE_URLS.join("\n")}\n\nHTML SAMPLE:\n${lastHtmlSample}\n`,
-      "utf8");
+      `NO LINES FOUND from:\n${CANDIDATE_SCHEDULE_URLS.join("\n")}\n\nHTML SAMPLE:\n${htmlSample}\n`, "utf8");
   } else {
-    const sample = scheduleLines.slice(0, 80).join("\n");
-    await fs.writeFile("debug-schedule.txt", `USED: ${usedScheduleUrl}\n---\n${sample}\n`, "utf8");
+    await fs.writeFile("debug-schedule.txt", `USED: ${usedScheduleUrl}\n---\n${scheduleLines.slice(0,80).join("\n")}\n`, "utf8");
   }
 
-  // TICKETS (домашние)
+  // БИЛЕТЫ
   let ticketBlocks = [];
   let usedTicketsUrl = "";
   for (const url of TICKETS_URLS) {
-    const page = await context.newPage();
+    const page = await browser.newPage();
+    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari");
+    await page.setExtraHTTPHeaders({ "Accept-Language": "ru,en;q=0.9" });
+
     if (await gotoWithRetry(page, url)) {
-      await acceptCookiesIfAny(page);
-      const links = page.locator("a");
-      const count = await links.count();
-      const blocks = [];
-      for (let i = 0; i < count; i++) {
-        const el = links.nth(i);
-        const txt = (await el.innerText().catch(()=>"")).trim();
-        if (!/(купить билеты|Купить билеты|Купить|Билеты)/i.test(txt)) continue;
-        const hrefRaw = await el.getAttribute("href");
-        const href = hrefRaw ? (hrefRaw.startsWith("http") ? hrefRaw : new URL(hrefRaw, "https://www.fclm.ru").toString()) : "";
-        const block = await el.evaluate((a) => {
+      const blocks = await page.evaluate(() => {
+        const out = [];
+        const links = Array.from(document.querySelectorAll("a"));
+        for (const a of links) {
+          const txt = (a.innerText || "").trim();
+          if (!/(купить билеты|Купить билеты|Купить|Билеты)/i.test(txt)) continue;
           let node = a;
           for (let j=0; j<6 && node && node.parentElement; j++) {
             node = node.parentElement;
             if ((node.innerText || "").trim().length > 40) break;
           }
-          return (node?.innerText || a.innerText || "").trim();
-        });
-        if (href) blocks.push({ href, blockText: block });
-      }
+          out.push({ href: a.href, blockText: (node?.innerText || a.innerText || "").trim() });
+        }
+        return out;
+      });
       if (blocks.length) { ticketBlocks = blocks; usedTicketsUrl = url; await page.close(); break; }
     }
     await page.close();
   }
+
   await fs.writeFile("debug-tickets.txt",
     ticketBlocks.length ? `USED: ${usedTicketsUrl}\n---\n${ticketBlocks.slice(0,20).map(b=>b.blockText).join("\n---\n")}\n`
                         : `NO TICKETS FOUND from:\n${TICKETS_URLS.join("\n")}\n`, "utf8");
 
-  await context.close();
   await browser.close();
 
   // Парсинг
   let fixtures = parseFixturesFromLines(scheduleLines);
-
-  // Fallback: если расписание пустое, но на билетах есть карточки,
-  // создадим хотя бы домашние матчи из билетов (без выездных)
   if (fixtures.length === 0 && ticketBlocks.length > 0) {
-    const homeFromTickets = parseFixturesFromLines(
-      ticketBlocks.map(b => b.blockText) // в блоках обычно есть "ДД.ММ ЧЧ:ММ Локомотив — ..."
-    ).filter(x => x.isHome);
+    const homeFromTickets = parseFixturesFromLines(ticketBlocks.map(b => b.blockText)).filter(x => x.isHome);
     fixtures = homeFromTickets;
   }
 
