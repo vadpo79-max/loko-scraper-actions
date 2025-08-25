@@ -20,6 +20,8 @@ const EN_RU = new Map(Object.entries({
   "Nizhny Novgorod":"Нижний Новгород", "Lokomotiv":"Локомотив"
 }));
 const toRu = (name) => EN_RU.get((name||"").trim()) || name;
+// Москва = UTC+3
+const MSK_OFFSET_MS = 3 * 3600 * 1000;
 
 
 // --- utils ---
@@ -149,13 +151,12 @@ function parseFixturesFromLines(lines) {
     // год и время
     const MSK_OFFSET_HOURS = 3;
     const year = (mm === 1 && new Date().getMonth() === 11) ? yearNow + 1 : yearNow;
-    const startUTC = new Date(Date.UTC(year, mm - 1, dd, hh - MSK_OFFSET, mi));
-    const endUTC   = new Date(Date.UTC(year, mm - 1, dd, hh - MSK_OFFSET, mi + 120)); // +2 часа
+   // время на сайте дано по Москве (UTC+3) → переводим в UTC
+    const startUTC = new Date(Date.UTC(year, mm - 1, dd, hh, mi) - MSK_OFFSET_MS);
+    const endUTC   = new Date(startUTC.getTime() + 2 * 3600 * 1000);
 
-    // пропускаем прошедшие матчи
     if (startUTC.getTime() <= Date.now()) continue;
 
-    // добавляем событие
     out.push({
       title: isHome ? `Локомотив — ${opp}` : `${opp} — Локомотив`,
       isHome,
