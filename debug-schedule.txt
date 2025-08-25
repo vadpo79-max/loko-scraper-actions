@@ -2,11 +2,6 @@ USED:
 ---
 We use cookies to make it easier and more convenient for you to use the site. By continuing browsing, you agree to the use of your cookies.
 AGREE
-FC LOKOMOTIV
-TICKETS
-SHOP
-CLUB
-ACADEMY
 RUS
 FC LOKOMOTIV
 News
@@ -50,6 +45,15 @@ Wallpapers
 Loyalty program
 Parking
 A fan card
+MY ACCOUNT
+SHOP
+FC LOKOMOTIV
+TICKETS
+CLUB
+CLUB TEAMS
+INFRASTRUCTURE
+ACADEMY
+TO FANS
 Go to main
 LOKO
 CALENDAR
@@ -59,6 +63,7 @@ FIRST TEAM
 ALL TOURNAMENTS
 ALL MONTH
 ALL MATCHES
+РЕКЛАМА • FCLM.RU
 JUNE
 2025
 25.06
@@ -75,8 +80,3 @@ Lokomotiv
 3 : 2
 Arsenal
 MATCH CENTER
-JULY
-2025
-05.07
-11:00 SAT
-Friendlies, Summer-2025 friendlies. Game 3
