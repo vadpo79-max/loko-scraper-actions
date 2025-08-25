@@ -43,8 +43,19 @@ function parseFixturesFromLines(lines) {
   const isWeekday = s => /\b(ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС|MON|TUE|WED|THU|FRI|SAT|SUN)\b/i.test(s || '');
   const isMonth   = s => /\b(ЯНВАРЬ|ФЕВРАЛЬ|МАРТ|АПРЕЛЬ|МАЙ|ИЮНЬ|ИЮЛЬ|АВГУСТ|СЕНТЯБРЬ|ОКТЯБРЬ|НОЯБРЬ|ДЕКАБРЬ|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\b/i.test(s || '');
   const isVS      = s => /^\s*vs\s*$/i.test(s || '');
-  const isTournament = s => /(rpl|premier|match ?day|day\s*\d+|friendlies|товарищ|кубок|тур|этап|группа|плей-офф|round|group|stage)/i.test(s || '');
+  const isTournament = s => /(rpl|премьер-лига|кубок|cup|match ?day|day\s*\d+|friendlies|товарищ|этап|stage|group|группа|round|тур)/i.test(s || '');
   const isNoise   = s => /match center|table|video|photo|tickets|купить|билеты|реклама/i.test(s || '');
+
+  // англ→рус для соперников (минимальный словарик, при необходимости дополним)
+  const EN_RU = new Map(Object.entries({
+    "Akhmat":"Ахмат","Akron":"Акрон","Dinamo":"Динамо","Dynamo":"Динамо",
+    "Baltika":"Балтика","Zenit":"Зенит","CSKA":"ЦСКА","Krasnodar":"Краснодар",
+    "Spartak":"Спартак","Rubin":"Рубин","Orenburg":"Оренбург","Ural":"Урал",
+    "Sochi":"Сочи","Rostov":"Ростов","Fakel":"Факел","Khimki":"Химки",
+    "Torpedo":"Торпедо","Krylia Sovetov":"Крылья Советов","Pari NN":"Пари НН",
+    "Nizhny Novgorod":"Нижний Новгород","Lokomotiv":"Локомотив"
+  }));
+  const toRu = (name) => EN_RU.get((name||"").trim()) || name;
 
   function pickOpponent(around) {
     const cleaned = around
@@ -53,7 +64,6 @@ function parseFixturesFromLines(lines) {
       .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isMonth(s) && !isVS(s) && !isTournament(s) && !isNoise(s))
       .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))
       .filter(s => s.length >= 2 && s.length <= 40);
-
     cleaned.sort((a, b) => {
       const cap = x => /^[A-ZА-ЯЁ]/.test(x) ? -1 : 0;
       return cap(a) - cap(b) || a.length - b.length;
@@ -61,10 +71,23 @@ function parseFixturesFromLines(lines) {
     return cleaned[0] || '';
   }
 
+  function extractCompetition(windowLines) {
+    // ищем строку турнира в окне карточки
+    const line = windowLines.find(s => isTournament(s) && !isNoise(s)) || '';
+    if (!line) return { competition:'', round:'' };
+    // вытащим "тур" как отдельное поле
+    const mRound = line.match(/(Тур\s*\d+|Round\s*\d+|Match\s*Day\s*\d+|Matchday\s*\d+)/i);
+    const round = mRound ? mRound[0].replace(/Match\s*Day/i,'Matchday') : '';
+    // уберём из строки "тур" и оставим название соревнования
+    const competition = line.replace(mRound?.[0] || '', '').replace(/[,\.\-–—]\s*$/, '').trim();
+    return { competition, round };
+  }
+
   for (let i = 0; i < lines.length; i++) {
     const L = lines[i];
     if (!isDate(L)) continue;
 
+    // время — в этой или следующих строках
     const lookTime = [L, lines[i+1] || '', lines[i+2] || ''].join(' ');
     const mTime = lookTime.match(/(\d{1,2}):(\d{2})/);
     if (!mTime) continue;
@@ -73,61 +96,66 @@ function parseFixturesFromLines(lines) {
     const dd = +mDate[1], mm = +mDate[2];
     const hh = +mTime[1], mi = +mTime[2];
 
-    // окно карточки
+    // окно карточки вокруг даты
     const W_START = i;
     const W_END = Math.min(lines.length, i + 18);
+    const windowLines = lines.slice(W_START, W_END);
 
-    // где «Локо»
+    // индекс "Локо"
     let idxLoko = -1;
     for (let j = W_START; j < W_END; j++) {
       if (isLoko(lines[j])) { idxLoko = j; break; }
     }
     if (idxLoko === -1) continue;
 
-    // где «VS»
+    // индекс "VS"
     let idxVS = -1;
     for (let j = idxLoko - 4; j <= idxLoko + 4; j++) {
       if (j >= W_START && j < W_END && isVS(lines[j])) { idxVS = j; break; }
     }
 
-    // кандидаты соперника вокруг «Локо»
+    // соперник — ближайшие строки вокруг "Локо"
     const around = [
       lines[idxLoko-4], lines[idxLoko-3], lines[idxLoko-2], lines[idxLoko-1],
       lines[idxLoko+1], lines[idxLoko+2], lines[idxLoko+3], lines[idxLoko+4]
     ];
     let opp = pickOpponent(around);
     if (!opp) continue;
-
-    // перевод на русское название при необходимости
     opp = toRu(opp);
 
     // дом/выезд
     let isHome = true;
     if (idxVS !== -1) {
-      isHome = idxLoko < idxVS;          // «Локо» слева от VS → дом
+      isHome = idxLoko < idxVS; // Локо слева от VS → дома
     } else {
       const posOpp = around.findIndex(s => (s || '').trim() === opp);
-      isHome = !(posOpp >= 0 && posOpp <= 2); // если соперник «выше», считаем выезд
+      isHome = !(posOpp >= 0 && posOpp <= 2); // если соперник "выше" — вероятнее выезд
     }
 
-    // год
+    // турнир/тур
+    const { competition, round } = extractCompetition(windowLines);
+
+    // год и время
     const year = (mm === 1 && new Date().getMonth() === 11) ? yearNow + 1 : yearNow;
     const start = new Date(year, mm - 1, dd, hh, mi);
     if (start <= now) continue;
-    const end = new Date(start.getTime() + 2*3600*1000);
+    const end = new Date(start.getTime() + 2 * 3600 * 1000);
 
     out.push({
       title: isHome ? `Локомотив — ${opp}` : `${opp} — Локомотив`,
       isHome,
       startISO: start.toISOString(),
       endISO: end.toISOString(),
-      location: isHome ? "РЖД Арена, Москва" : ""
+      location: isHome ? "РЖД Арена, Москва" : "",
+      competition: competition,   // например: "Россия. Премьер-лига"
+      round: round                // например: "Тур 7" или "Групповой этап. Тур 3"
     });
   }
 
   const key = e => e.title + '|' + e.startISO;
   return [...new Map(out.map(e => [key(e), e])).values()];
 }
+
 
 
 
