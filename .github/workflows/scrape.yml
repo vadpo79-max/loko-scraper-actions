@@ -1,11 +1,11 @@
 name: Scrape Loko Fixtures
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:        # ручной запуск кнопкой
   schedule:
-    - cron: "0 6 * * 5"  # каждую пятницу 06:00 UTC (~ 09:00 по Хельсинки)
-  push:
-    branches: [ main ]        # запускать при любом коммите в main
+    - cron: "0 6 * * 5"     # по пятницам 06:00 UTC
+  push:                     # запускать при коммитах в эти файлы (если кнопки нет)
+    branches: [ main ]
     paths:
       - "scraper.mjs"
       - "package.json"
@@ -17,6 +17,7 @@ permissions:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -38,7 +39,7 @@ jobs:
       - name: Commit fixtures.json and diagnostics
         run: |
           git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
-    git add fixtures.json debug-schedule.txt debug-tickets.txt || true
-    git commit -m "Update fixtures + debug [skip ci]" || echo "No changes"
-    git push
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fixtures.json debug-schedule.txt debug-tickets.txt || true
+          git commit -m "Update fixtures + debug [skip ci]" || echo "No changes"
+          git push
