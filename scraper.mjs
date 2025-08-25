@@ -69,15 +69,48 @@ async function run() {
 
   // Календарь
   const page = await context.newPage();
-  await page.goto("https://www.fclm.ru/schedule/", { waitUntil: "networkidle" });
-  await page.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise(r => setTimeout(r, 800)); });
+  await context.route(/\.(?:png|jpg|jpeg|gif|webp|svg|woff2?)$/i, route => route.abort());
+await context.route(/googletagmanager|google-analytics|yandex|metric|facebook|vk\.com/i, route => route.abort());
+
+  //await page.goto("https://www.fclm.ru/schedule/", { waitUntil: "networkidle" });
+  //await page.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise(r => setTimeout(r, 800)); });
+  // helper: мягкая навигация с ретраями
+async function gotoWithRetry(page, url) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      await page.goto(url, { waitUntil: "load", timeout: 120000 }); // 120 cек
+      // небольшая пауза чтобы дорисовался контент
+      await page.waitForTimeout(2000);
+      return;
+    } catch (e) {
+      if (attempt === 3) throw e;
+      await page.waitForTimeout(2000 * attempt); // backoff
+    }
+  }
+}
+
+// перед навигацией добавим пару анти‑бот штрихов
+await context.addInitScript(() => {
+  Object.defineProperty(navigator, 'webdriver', { get: () => false });
+});
+
+await gotoWithRetry(page, "https://www.fclm.ru/schedule/");
+
+// проскроллить вниз (ленивая подгрузка)
+await page.evaluate(async () => {
+  window.scrollTo(0, document.body.scrollHeight);
+  await new Promise(r => setTimeout(r, 1200));
+});
+
 
   const scheduleLines = (await page.locator("body").innerText())
     .split("\n").map(s => s.trim()).filter(Boolean);
 
   // Билеты
   const page2 = await context.newPage();
-  await page2.goto("https://www.fclm.ru/tickets/", { waitUntil: "networkidle" });
+ // await page2.goto("https://www.fclm.ru/tickets/", { waitUntil: "networkidle" });
+  await gotoWithRetry(page2, "https://www.fclm.ru/tickets/");
+
 
   const links = page2.locator("a");
   const count = await links.count();
