@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-08-25T18:56:47.020Z",
+  "generatedAt": "2025-08-25T19:03:17.303Z",
   "count": 11,
   "fixtures": [
     {
@@ -13,13 +13,14 @@
       "ticketUrl": "https://www.fclm.ru/tickets/#"
     },
     {
-      "title": "Локомотив — СЕНТЯБРЬ",
+      "title": "Локомотив — Крылья Советов",
       "isHome": true,
       "startISO": "2025-08-31T15:45:00.000Z",
       "endISO": "2025-08-31T17:45:00.000Z",
       "location": "РЖД Арена, Москва",
       "competition": "Россия. Премьер-лига",
-      "round": "Тур 7"
+      "round": "Тур 7",
+      "ticketUrl": "https://www.fclm.ru/tickets/#"
     },
     {
       "title": "Ахмат — Локомотив",
