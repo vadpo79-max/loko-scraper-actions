@@ -4,6 +4,12 @@ on:
   workflow_dispatch: 
   schedule:
     - cron: "0 6 * * 5"  # каждую пятницу 06:00 UTC (~ 09:00 по Хельсинки)
+  push:
+    branches: [ main ]        # запускать при любом коммите в main
+    paths:
+      - "scraper.mjs"
+      - "package.json"
+      - ".github/workflows/scrape.yml"
 
 permissions:
   contents: write
