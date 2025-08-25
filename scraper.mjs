@@ -12,6 +12,9 @@ const TICKETS_URLS = [
   "https://www.fclm.ru/en/tickets/schedule/"
 ];
 
+// --- utils ---
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
 function uniqBy(arr, keyFn) {
   const m = new Map();
   arr.forEach(x => m.set(keyFn(x), x));
@@ -78,29 +81,26 @@ async function gotoWithRetry(page, url) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       await page.goto(url, { waitUntil: "load", timeout: 120000 });
-      await page.waitForTimeout(1500);
+      await sleep(1500);
       return true;
     } catch (_) {
-      await page.waitForTimeout(2000 * attempt);
+      await sleep(2000 * attempt);
     }
   }
   return false;
 }
 
 async function acceptCookiesIfAny(page) {
-  const candidates = [
-    'button:contains("Согласен")',
-    'button:contains("Принять")',
-    'button:contains("Accept")',
-  ];
-  for (const sel of candidates) {
-    const ok = await page.$eval('body', (body, s) => {
-      const el = [...body.querySelectorAll('button')].find(b => (b.innerText||'').includes(s));
-      if (el) { el.click(); return true; }
-      return false;
-    }, sel.replace(/^button:contains\(|\)$/g,'')).catch(()=>false);
-    if (ok) await page.waitForTimeout(500);
-  }
+  // ищем любую кнопку с текстом Согласен/Принять/Accept
+  try {
+    await page.evaluate(() => {
+      const texts = ["Согласен","Принять","Accept"];
+      const btn = [...document.querySelectorAll('button, [role="button"], .btn, .button')]
+        .find(b => texts.some(t => (b.innerText||"").includes(t)));
+      if (btn) btn.click();
+    });
+    await sleep(500);
+  } catch {}
 }
 
 async function bodyLines(page) {
@@ -108,13 +108,14 @@ async function bodyLines(page) {
   return txt.split('\n').map(s => s.trim()).filter(Boolean);
 }
 
+// --- main ---
 async function run() {
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox","--disable-setuid-sandbox"]
   });
 
-  // КАЛЕНДАРЬ
+  // --- календарь ---
   let scheduleLines = [];
   let usedScheduleUrl = "";
   let htmlSample = "";
@@ -126,13 +127,16 @@ async function run() {
 
     if (await gotoWithRetry(page, url)) {
       await acceptCookiesIfAny(page);
-      await page.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise(r=>setTimeout(r,1200)); });
+      await page.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); });
+      await sleep(1200);
 
-      // ждём, пока в теле появится дата и «Локомотив»
-      await page.waitForFunction(() => {
-        const t = (document.body.innerText || '').replace(/\s+/g,' ');
-        return /\d{1,2}\.\d{1,2}/.test(t) && /Локомотив/i.test(t);
-      }, { timeout: 20000 }).catch(()=>{});
+      // ждём, пока появится дата и «Локомотив»
+      try {
+        await page.waitForFunction(() => {
+          const t = (document.body.innerText || '').replace(/\s+/g,' ');
+          return /\d{1,2}\.\d{1,2}/.test(t) && /Локомотив/i.test(t);
+        }, { timeout: 20000 });
+      } catch {}
 
       scheduleLines = await bodyLines(page);
       htmlSample = (await page.content()).slice(0, 2000);
@@ -149,7 +153,7 @@ async function run() {
     await fs.writeFile("debug-schedule.txt", `USED: ${usedScheduleUrl}\n---\n${scheduleLines.slice(0,80).join("\n")}\n`, "utf8");
   }
 
-  // БИЛЕТЫ
+  // --- билеты ---
   let ticketBlocks = [];
   let usedTicketsUrl = "";
   for (const url of TICKETS_URLS) {
@@ -158,6 +162,7 @@ async function run() {
     await page.setExtraHTTPHeaders({ "Accept-Language": "ru,en;q=0.9" });
 
     if (await gotoWithRetry(page, url)) {
+      await acceptCookiesIfAny(page);
       const blocks = await page.evaluate(() => {
         const out = [];
         const links = Array.from(document.querySelectorAll("a"));
@@ -184,7 +189,7 @@ async function run() {
 
   await browser.close();
 
-  // Парсинг
+  // --- парсинг + fallback ---
   let fixtures = parseFixturesFromLines(scheduleLines);
   if (fixtures.length === 0 && ticketBlocks.length > 0) {
     const homeFromTickets = parseFixturesFromLines(ticketBlocks.map(b => b.blockText)).filter(x => x.isHome);
