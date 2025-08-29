@@ -1,16 +1,7 @@
 {
-  "generatedAt": "2025-08-25T19:58:05.039Z",
-  "count": 11,
+  "generatedAt": "2025-08-29T06:50:16.062Z",
+  "count": 10,
   "fixtures": [
-    {
-      "title": "Локомотив — Акрон",
-      "isHome": true,
-      "startISO": "2025-08-28T16:30:00.000Z",
-      "endISO": "2025-08-28T18:30:00.000Z",
-      "location": "РЖД Арена, Москва",
-      "competition": "Fonbet Кубок России, Групповой этап",
-      "round": "Тур 3"
-    },
     {
       "title": "Локомотив — Крылья Советов",
       "isHome": true,
