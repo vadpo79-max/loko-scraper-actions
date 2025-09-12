@@ -1,16 +1,7 @@
 {
-  "generatedAt": "2025-09-05T06:49:02.090Z",
-  "count": 10,
+  "generatedAt": "2025-09-12T06:47:34.043Z",
+  "count": 9,
   "fixtures": [
-    {
-      "title": "МАТЧ-ЦЕНТР — Локомотив",
-      "isHome": false,
-      "startISO": "2025-09-07T15:00:00.000Z",
-      "endISO": "2025-09-07T17:00:00.000Z",
-      "location": "",
-      "competition": "Товарищеские матчи, Беларусь",
-      "round": ""
-    },
     {
       "title": "Ахмат — Локомотив",
       "isHome": false,
