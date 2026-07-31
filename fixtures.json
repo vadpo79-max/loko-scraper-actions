@@ -1,16 +1,7 @@
 {
-  "generatedAt": "2026-07-24T08:10:49.708Z",
-  "count": 12,
+  "generatedAt": "2026-07-31T08:37:13.886Z",
+  "count": 11,
   "fixtures": [
-    {
-      "title": "Локомотив — Ахмат",
-      "isHome": true,
-      "startISO": "2026-07-26T14:00:00.000Z",
-      "endISO": "2026-07-26T16:00:00.000Z",
-      "location": "РЖД Арена, Москва",
-      "competition": "Россия. Премьер-лига",
-      "round": "Тур 1"
-    },
     {
       "title": "Динамо Мх — Локомотив",
       "isHome": false,
