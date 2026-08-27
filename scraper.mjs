@@ -1,331 +1,241 @@
 import fs from "fs/promises";
-import puppeteer from "puppeteer";
 
-const CANDIDATE_SCHEDULE_URLS = [
-  "https://www.fclm.ru/schedule/",
-  "https://www.fclm.ru/schedule/?print=Y"
-]; // только RU-страницы
-
-const TICKETS_URLS = [
-  "https://www.fclm.ru/tickets/"
+const SOURCE_URLS = [
+  "https://r.jina.ai/https://www.fclm.ru/schedule/",
+  "https://r.jina.ai/http://www.fclm.ru/schedule/"
 ];
 
-// словарь англ → рус для соперников
+const MSK_OFFSET_MS = 3 * 60 * 60 * 1000;
+const HOME_STADIUM = "РЖД Арена, Москва";
+
 const EN_RU = new Map(Object.entries({
-  "Akhmat":"Ахмат", "Akron":"Акрон", "Dinamo":"Динамо", "Dynamo":"Динамо",
-  "Baltika":"Балтика", "Zenit":"Зенит", "CSKA":"ЦСКА", "Krasnodar":"Краснодар",
-  "Spartak":"Спартак", "Rubin":"Рубин", "Orenburg":"Оренбург", "Ural":"Урал",
-  "Sochi":"Сочи", "Rostov":"Ростов", "Fakel":"Факел", "Khimki":"Химки",
-  "Torpedo":"Торпедо", "Krylia Sovetov":"Крылья Советов", "Pari NN":"Пари НН",
-  "Nizhny Novgorod":"Нижний Новгород", "Lokomotiv":"Локомотив"
+  "Lokomotiv":"Локомотив",
+  "Akhmat":"Ахмат",
+  "Akron":"Акрон",
+  "Baltika":"Балтика",
+  "Zenit":"Зенит",
+  "Spartak":"Спартак",
+  "Rubin":"Рубин",
+  "Orenburg":"Оренбург",
+  "Rostov":"Ростов",
+  "Fakel":"Факел",
+  "Krasnodar":"Краснодар",
+  "Rodina":"Родина",
+  "Krylia Sovetov":"Крылья Советов",
+  "PFC CSKA":"ПФК ЦСКА",
+  "CSKA":"ПФК ЦСКА",
+  "Dinamo Mkh":"Динамо Мх",
+  "Dynamo Makhachkala":"Динамо Мх",
+  "Dynamo Moscow":"Динамо Москва",
+  "Dinamo Moscow":"Динамо Москва"
 }));
-const toRu = (name) => EN_RU.get((name||"").trim()) || name;
-// Москва = UTC+3
-const MSK_OFFSET_MS = 3 * 3600 * 1000;
 
-
-// --- utils ---
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-function uniqBy(arr, keyFn) {
-  const m = new Map();
-  arr.forEach(x => m.set(keyFn(x), x));
-  return [...m.values()];
+function toRu(s) {
+  const x = (s || "").trim();
+  return EN_RU.get(x) || x;
 }
 
-function parseFixturesFromLines(lines) {
-  const now = new Date();
-  const yearNow = now.getFullYear();
-  const out = [];
+function cleanLine(raw) {
+  let s = (raw || "").trim();
+  if (!s) return "";
 
-  const isLoko    = s => /локомотив|lokomotiv/i.test(s || '');
-  const isScore   = s => /^\s*\d+\s*[:\-]\s*\d+\s*$/.test(s || '');
-  const isTime    = s => /\b\d{1,2}:\d{2}\b/.test(s || '');
-  const isDate    = s => /\b\d{1,2}\.\d{1,2}\b/.test(s || '');
-  const isWeekday = s => /\b(ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС|MON|TUE|WED|THU|FRI|SAT|SUN)\b/i.test(s || '');
-  const isMonth   = s => /\b(ЯНВАРЬ|ФЕВРАЛЬ|МАРТ|АПРЕЛЬ|МАЙ|ИЮНЬ|ИЮЛЬ|АВГУСТ|СЕНТЯБРЬ|ОКТЯБРЬ|НОЯБРЬ|ДЕКАБРЬ|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\b/i.test(s || '');
-  const isVS      = s => /^\s*vs\s*$/i.test(s || '');
-  const isTournament = s => /(rpl|премьер-лига|кубок|cup|match ?day|day\s*\d+|friendlies|товарищ|этап|stage|group|группа|round|тур)/i.test(s || '');
-  const isNoise   = s => /match center|table|video|photo|tickets|купить|билеты|реклама/i.test(s || '');
+  // Reader обычно отдаёт картинки как Markdown. Они дублируют имя команды — выбрасываем.
+  if (/^!\[.*\]\(.*\)$/.test(s)) return "";
+  if (/^\[?Image:/i.test(s)) return "";
 
-  // англ→рус для соперников (минимальный словарик, при необходимости дополним)
-  const EN_RU = new Map(Object.entries({
-    "Akhmat":"Ахмат","Akron":"Акрон","Dinamo":"Динамо","Dynamo":"Динамо",
-    "Baltika":"Балтика","Zenit":"Зенит","CSKA":"ЦСКА","Krasnodar":"Краснодар",
-    "Spartak":"Спартак","Rubin":"Рубин","Orenburg":"Оренбург","Ural":"Урал",
-    "Sochi":"Сочи","Rostov":"Ростов","Fakel":"Факел","Khimki":"Химки",
-    "Torpedo":"Торпедо","Krylia Sovetov":"Крылья Советов","Pari NN":"Пари НН",
-    "Nizhny Novgorod":"Нижний Новгород","Lokomotiv":"Локомотив"
-  }));
-  const toRu = (name) => EN_RU.get((name||"").trim()) || name;
+  // Обычную Markdown-ссылку превращаем в видимый текст.
+  s = s.replace(/^\[([^\]]+)\]\([^)]*\)$/g, "$1");
+  s = s.replace(/^#{1,6}\s*/, "");
+  s = s.replace(/^[-*+]\s+/, "");
+  return s.trim();
+}
 
-  function pickOpponent(around) {
-    const cleaned = around
-      .map(s => (s || '').trim())
-      .filter(Boolean)
-      .filter(s => !isLoko(s) && !isScore(s) && !isTime(s) && !isWeekday(s) && !isMonth(s) && !isVS(s) && !isTournament(s) && !isNoise(s))
-      .filter(s => !/^\d{4}$/.test(s))                   // год ("2025")
-      .filter(s => !/^(ЯНВАРЬ|ФЕВРАЛЬ|МАРТ|АПРЕЛЬ|МАЙ|ИЮНЬ|ИЮЛЬ|АВГУСТ|СЕНТЯБРЬ|ОКТЯБРЬ|НОЯБРЬ|ДЕКАБРЬ)$/i.test(s)) // отдельная строка-месяц
-      .filter(s => /[A-Za-zА-Яа-яЁё]/.test(s))
-      .filter(s => s.length >= 2 && s.length <= 40);
+function isDate(s) {
+  return /^\d{1,2}\.\d{1,2}$/.test(s);
+}
 
-    // если есть несколько — отдаём предпочтение строке с пробелом (обычно названия команд из 2 слов)
-    cleaned.sort((a, b) => {
-      const score = (x) => {
-        let sc = 0;
-        if (/^[A-ZА-ЯЁ]/.test(x)) sc -= 1;  // заглавная буква — приоритет
-        if (/\s/.test(x)) sc -= 1;          // есть пробел — приоритет ("Крылья Советов")
-        return sc;
-      };
-      return score(a) - score(b) || a.length - b.length;
-    });
+function isYear(s) {
+  return /^20\d{2}$/.test(s);
+}
 
-    return cleaned[0] || '';
+function isTime(s) {
+  return /^\d{1,2}:\d{2}(?:\s+[А-ЯA-Za-z]{2,3})?$/.test(s);
+}
+
+function isCompetition(s) {
+  return /(премьер-лига|кубок|rpl|russian cup|фонбет|fonbet|товарищ|friendlies|тур\s*\d+|day\s*\d+)/i.test(s);
+}
+
+function isNoise(s) {
+  return /^(матч-центр|match center|купить билеты|билеты|tickets|календарь игр|loko calendar)$/i.test(s)
+    || /^https?:\/\//i.test(s)
+    || /^\[.*\]:/.test(s);
+}
+
+function isTeamName(s) {
+  if (!s || isNoise(s) || isDate(s) || isTime(s) || isYear(s) || isCompetition(s)) return false;
+  if (/^vs$/i.test(s)) return false;
+  if (/^\d+\s*[:\-]\s*\d+$/.test(s)) return false;
+  if (!/[A-Za-zА-Яа-яЁё]/.test(s)) return false;
+  return s.length >= 2 && s.length <= 50;
+}
+
+function previousTeam(lines, from) {
+  for (let i = from - 1; i >= 0; i--) {
+    if (isTeamName(lines[i])) return toRu(lines[i]);
   }
+  return "";
+}
 
-
-  function extractCompetition(windowLines) {
-    // ищем строку турнира в окне карточки
-    const line = windowLines.find(s => isTournament(s) && !isNoise(s)) || '';
-    if (!line) return { competition:'', round:'' };
-    // вытащим "тур" как отдельное поле
-    const mRound = line.match(/(Тур\s*\d+|Round\s*\d+|Match\s*Day\s*\d+|Matchday\s*\d+)/i);
-    const round = mRound ? mRound[0].replace(/Match\s*Day/i,'Matchday') : '';
-    // уберём из строки "тур" и оставим название соревнования
-    const competition = line.replace(mRound?.[0] || '', '').replace(/[,\.\-–—]\s*$/, '').trim();
-    return { competition, round };
+function nextTeam(lines, from) {
+  for (let i = from + 1; i < lines.length; i++) {
+    if (isTeamName(lines[i])) return toRu(lines[i]);
   }
+  return "";
+}
+
+function parseFixtures(text) {
+  const lines = text.split(/\r?\n/).map(cleanLine).filter(Boolean);
+  const now = Date.now();
+  const fixtures = [];
+  let currentYear = new Date().getUTCFullYear();
 
   for (let i = 0; i < lines.length; i++) {
-    const L = lines[i];
-    if (!isDate(L)) continue;
-
-    // время — в этой или следующих строках
-    const lookTime = [L, lines[i+1] || '', lines[i+2] || ''].join(' ');
-    const mTime = lookTime.match(/(\d{1,2}):(\d{2})/);
-    if (!mTime) continue;
-
-    const mDate = L.match(/(\d{1,2})\.(\d{1,2})/);
-    const dd = +mDate[1], mm = +mDate[2];
-    const hh = +mTime[1], mi = +mTime[2];
-
-    // окно карточки вокруг даты
-    const W_START = i;
-    const W_END = Math.min(lines.length, i + 18);
-    const windowLines = lines.slice(W_START, W_END);
-
-    // индекс "Локо"
-    let idxLoko = -1;
-    for (let j = W_START; j < W_END; j++) {
-      if (isLoko(lines[j])) { idxLoko = j; break; }
+    if (isYear(lines[i])) {
+      currentYear = Number(lines[i]);
+      continue;
     }
-    if (idxLoko === -1) continue;
+    if (!isDate(lines[i])) continue;
 
-    // индекс "VS"
-    let idxVS = -1;
-    for (let j = idxLoko - 4; j <= idxLoko + 4; j++) {
-      if (j >= W_START && j < W_END && isVS(lines[j])) { idxVS = j; break; }
+    const card = [];
+    for (let j = i; j < lines.length; j++) {
+      if (j > i && isDate(lines[j])) break;
+      if (j > i && isYear(lines[j])) break;
+      card.push(lines[j]);
+      if (card.length >= 22) break;
     }
 
-    // соперник — ближайшие строки вокруг "Локо"
-    const around = [
-      lines[idxLoko-4], lines[idxLoko-3], lines[idxLoko-2], lines[idxLoko-1],
-      lines[idxLoko+1], lines[idxLoko+2], lines[idxLoko+3], lines[idxLoko+4]
-    ];
-    let opp = pickOpponent(around);
-    if (!opp) continue;
-    opp = toRu(opp);
+    const vsIndex = card.findIndex(x => /^vs$/i.test(x));
+    if (vsIndex < 0) continue; // нас интересуют будущие матчи
 
-    // дом/выезд
-    let isHome = true;
-    if (idxVS !== -1) {
-      isHome = idxLoko < idxVS; // Локо слева от VS → дома
-    } else {
-      const posOpp = around.findIndex(s => (s || '').trim() === opp);
-      isHome = !(posOpp >= 0 && posOpp <= 2); // если соперник "выше" — вероятнее выезд
-    }
+    const timeLine = card.find(isTime);
+    if (!timeLine) continue;
 
-    // турнир/тур
-    const { competition, round } = extractCompetition(windowLines);
+    const team1 = previousTeam(card, vsIndex);
+    const team2 = nextTeam(card, vsIndex);
+    if (!team1 || !team2) continue;
 
-    // год и время
-    const MSK_OFFSET_HOURS = 3;
-    const year = (mm === 1 && new Date().getMonth() === 11) ? yearNow + 1 : yearNow;
-   // время на сайте дано по Москве (UTC+3) → переводим в UTC
-    const startUTC = new Date(Date.UTC(year, mm - 1, dd, hh, mi) - MSK_OFFSET_MS);
-    const endUTC   = new Date(startUTC.getTime() + 2 * 3600 * 1000);
+    const isLoko1 = /локомотив|lokomotiv/i.test(team1);
+    const isLoko2 = /локомотив|lokomotiv/i.test(team2);
+    if (!isLoko1 && !isLoko2) continue;
 
-    if (startUTC.getTime() <= Date.now()) continue;
+    const [dd, mm] = card[0].split(".").map(Number);
+    const tm = timeLine.match(/^(\d{1,2}):(\d{2})/);
+    const hh = Number(tm[1]);
+    const mi = Number(tm[2]);
 
-    out.push({
-      title: isHome ? `Локомотив — ${opp}` : `${opp} — Локомотив`,
-      isHome,
+    const startUTC = new Date(Date.UTC(currentYear, mm - 1, dd, hh, mi) - MSK_OFFSET_MS);
+    if (startUTC.getTime() <= now) continue;
+    const endUTC = new Date(startUTC.getTime() + 2 * 60 * 60 * 1000);
+
+    const competitionLine = card.find(isCompetition) || "";
+    const roundMatch = competitionLine.match(/(Тур\s*\d+|Day\s*\d+)/i);
+    const round = roundMatch ? roundMatch[0].replace(/^Day/i, "Тур") : "";
+    const competition = competitionLine
+      .replace(roundMatch?.[0] || "", "")
+      .replace(/[,.;:\-–—]+\s*$/, "")
+      .trim();
+
+    const home = isLoko1;
+    const opponent = home ? team2 : team1;
+
+    fixtures.push({
+      title: home ? `Локомотив — ${opponent}` : `${opponent} — Локомотив`,
+      isHome: home,
       startISO: startUTC.toISOString(),
       endISO: endUTC.toISOString(),
-      location: isHome ? "РЖД Арена, Москва" : "",
+      location: home ? HOME_STADIUM : "",
       competition,
       round
     });
   }
 
-  const key = e => e.title + '|' + e.startISO;
-  return [...new Map(out.map(e => [key(e), e])).values()];
+  const unique = new Map();
+  for (const f of fixtures) unique.set(`${f.title}|${f.startISO}`, f);
+  return [...unique.values()].sort((a, b) => a.startISO.localeCompare(b.startISO));
 }
 
-
-
-
-
-
-function buildTicketMap(blocks) {
-  const map = new Map();
-  for (const b of blocks) {
-    const oppM  = b.blockText.match(/Локомотив\s*(?:vs|—|-|:)\s*([A-Za-zА-Яа-яёЁ0-9.\- ]+)/i);
-    const dateM = b.blockText.match(/\b(\d{1,2})\.(\d{1,2})\b/);
-    const timeM = b.blockText.match(/\b(\d{1,2}):(\d{2})\b/);
-    if (!oppM || !dateM || !timeM) continue;
-
-    const opp = oppM[1].trim().replace(/\s+/g," ").toLowerCase();
-    const dd = String(dateM[1]).padStart(2,"0");
-    const mm = String(dateM[2]).padStart(2,"0");
-    const hh = String(timeM[1]).padStart(2,"0");
-    const mi = String(timeM[2]).padStart(2,"0");
-    const key = `home:${mm}-${dd} ${hh}:${mi} ${opp}`;
-    map.set(key, b.href);
-  }
-  return map;
-}
-
-async function gotoWithRetry(page, url) {
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      await page.goto(url, { waitUntil: "load", timeout: 120000 });
-      await sleep(1500);
-      return true;
-    } catch (_) {
-      await sleep(2000 * attempt);
-    }
-  }
-  return false;
-}
-
-async function acceptCookiesIfAny(page) {
-  // ищем любую кнопку с текстом Согласен/Принять/Accept
+async function fetchText(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 90000);
   try {
-    await page.evaluate(() => {
-      const texts = ["Согласен","Принять","Accept"];
-      const btn = [...document.querySelectorAll('button, [role="button"], .btn, .button')]
-        .find(b => texts.some(t => (b.innerText||"").includes(t)));
-      if (btn) btn.click();
+    const r = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "loko-calendar/2.0",
+        "Accept": "text/plain,text/markdown;q=0.9,*/*;q=0.5"
+      }
     });
-    await sleep(500);
-  } catch {}
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.text();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
-async function bodyLines(page) {
-  const txt = await page.evaluate(() => (document.body.innerText || ''));
-  return txt.split('\n').map(s => s.trim()).filter(Boolean);
-}
-
-// --- main ---
 async function run() {
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox","--disable-setuid-sandbox"]
-  });
+  let source = "";
+  let sourceText = "";
+  let fixtures = [];
+  const errors = [];
 
-  // --- календарь ---
-  let scheduleLines = [];
-  let usedScheduleUrl = "";
-  let htmlSample = "";
-
-  for (const url of CANDIDATE_SCHEDULE_URLS) {
-    const page = await browser.newPage();
-    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari");
-    await page.setExtraHTTPHeaders({ "Accept-Language": "ru,en;q=0.9" });
-
-    if (await gotoWithRetry(page, url)) {
-      await acceptCookiesIfAny(page);
-      await page.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); });
-      await sleep(1200);
-
-      // ждём, пока появится дата и «Локомотив»
-      try {
-        await page.waitForFunction(() => {
-          const t = (document.body.innerText || '').replace(/\s+/g,' ');
-          return /\d{1,2}\.\d{1,2}/.test(t) && /Локомотив/i.test(t);
-        }, { timeout: 20000 });
-      } catch {}
-
-      scheduleLines = await bodyLines(page);
-      htmlSample = (await page.content()).slice(0, 2000);
-      const score = scheduleLines.filter(l => /\d{1,2}\.\d{1,2}/.test(l) && /Локомотив/i.test(l)).length;
-      if (score > 0) { usedScheduleUrl = url; await page.close(); break; }
+  for (const url of SOURCE_URLS) {
+    try {
+      const text = await fetchText(url);
+      const parsed = parseFixtures(text);
+      if (parsed.length > 0) {
+        source = url;
+        sourceText = text;
+        fixtures = parsed;
+        break;
+      }
+      errors.push(`${url}: parsed 0 fixtures, body=${text.length} chars`);
+    } catch (e) {
+      errors.push(`${url}: ${e.message}`);
     }
-    await page.close();
   }
 
-  if (!scheduleLines.length) {
-    await fs.writeFile("debug-schedule.txt",
-      `NO LINES FOUND from:\n${CANDIDATE_SCHEDULE_URLS.join("\n")}\n\nHTML SAMPLE:\n${htmlSample}\n`, "utf8");
-  } else {
-    await fs.writeFile("debug-schedule.txt", `USED: ${usedScheduleUrl}\n---\n${scheduleLines.slice(0,400).join("\n")}\n`, "utf8");
+  await fs.writeFile(
+    "debug-schedule.txt",
+    fixtures.length
+      ? `USED: ${source}\nFOUND: ${fixtures.length}\n---\n${sourceText.slice(0, 12000)}\n`
+      : `NO FIXTURES FOUND\n${errors.join("\n")}\n`,
+    "utf8"
+  );
+
+  await fs.writeFile(
+    "debug-tickets.txt",
+    "Ticket scraping disabled: calendar no longer depends on ticket page.\n",
+    "utf8"
+  );
+
+  if (fixtures.length === 0) {
+    // Важное: намеренно завершаем с ошибкой. Workflow дополнительно восстановит предыдущий fixtures.json.
+    throw new Error(`No fixtures parsed. ${errors.join(" | ")}`);
   }
 
-  // --- билеты ---
-  let ticketBlocks = [];
-  let usedTicketsUrl = "";
-  for (const url of TICKETS_URLS) {
-    const page = await browser.newPage();
-    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari");
-    await page.setExtraHTTPHeaders({ "Accept-Language": "ru,en;q=0.9" });
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    source,
+    count: fixtures.length,
+    fixtures
+  };
 
-    if (await gotoWithRetry(page, url)) {
-      await acceptCookiesIfAny(page);
-      const blocks = await page.evaluate(() => {
-        const out = [];
-        const links = Array.from(document.querySelectorAll("a"));
-        for (const a of links) {
-          const txt = (a.innerText || "").trim();
-          if (!/(купить билеты|Купить билеты|Купить|Билеты)/i.test(txt)) continue;
-          let node = a;
-          for (let j=0; j<6 && node && node.parentElement; j++) {
-            node = node.parentElement;
-            if ((node.innerText || "").trim().length > 40) break;
-          }
-          out.push({ href: a.href, blockText: (node?.innerText || a.innerText || "").trim() });
-        }
-        return out;
-      });
-      if (blocks.length) { ticketBlocks = blocks; usedTicketsUrl = url; await page.close(); break; }
-    }
-    await page.close();
-  }
-
-  await fs.writeFile("debug-tickets.txt",
-    ticketBlocks.length ? `USED: ${usedTicketsUrl}\n---\n${ticketBlocks.slice(0,20).map(b=>b.blockText).join("\n---\n")}\n`
-                        : `NO TICKETS FOUND from:\n${TICKETS_URLS.join("\n")}\n`, "utf8");
-
-  await browser.close();
-
-  // --- парсинг + fallback ---
-  let fixtures = parseFixturesFromLines(scheduleLines);
-  if (fixtures.length === 0 && ticketBlocks.length > 0) {
-    const homeFromTickets = parseFixturesFromLines(ticketBlocks.map(b => b.blockText)).filter(x => x.isHome);
-    fixtures = homeFromTickets;
-  }
-
-  const tmap = buildTicketMap(ticketBlocks);
-  fixtures.forEach(f => {
-    if (!f.isHome) return;
-    const d = new Date(f.startISO);
-    const key = `home:${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")} ${f.title.replace(/^Локомотив — /,'').toLowerCase()}`;
-    if (tmap.has(key)) f.ticketUrl = tmap.get(key);
-  });
-
-  const payload = { generatedAt: new Date().toISOString(), count: fixtures.length, fixtures };
   await fs.writeFile("fixtures.json", JSON.stringify(payload, null, 2), "utf8");
-  console.log("WROTE fixtures.json with", fixtures.length, "records");
+  console.log("WROTE fixtures.json with", fixtures.length, "records from", source);
 }
 
-run().catch(e => { console.error(e); process.exit(1); });
+run().catch(e => {
+  console.error(e);
+  process.exit(1);
+});
