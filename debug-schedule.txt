@@ -1,375 +1,505 @@
-USED: 
----
-Вы используете устаревшую версию браузера. Обновите его для безопасной и стабильной работы Подробнее
-×
-Мы используем cookies, чтобы вам было проще и удобнее работать с сайтом. Продолжая просмотр, вы соглашаетесь на использование ваших файлов cookie.
-СОГЛАСЕН
-ENG
-ФК ЛОКОМОТИВ
-Новости
-Календарь
-Турнирная таблица
-Игроки
-Тренерский штаб
-Видео
-Фото
-БИЛЕТЫ
-День матча
-Купить билет
-ВИП-ЛОЖИ
-ВИП-ЗОНЫ
-СЕМЕЙНЫЙ СЕКТОР
-Туры по стадиону
-Места для МГН
-КЛУБ
-О Клубе
-История
-Спонсоры
-Стать партнером
-Контакты
-Антидопинг
-КОМАНДЫ КЛУБА
-ЖФК «Локомотив»
-Молодёжка-юноши
-Молодёжка-девушки
-ИНФРАСТРУКТУРА
-РЖД Арена
-Организация мероприятий
-Аренда полей
-Аренда площадей
-Ледовый дворец
-Занятия спортом
-АКАДЕМИЯ
-Локо Старт
-Локо-Лето
-Академия
-Как поступить
-Руководство
-Контакты Академии
-БОЛЕЛЬЩИКАМ
-Информация для болельщиков
-Банковская карта «Локомотив»
-Заставки
-Парковка
-Карта болельщика
-Программа лояльности
-Информация для болельщиков МГН
-ЛИЧНЫЙ КАБИНЕТ
-ИНТЕРНЕТ-МАГАЗИН
-ФК ЛОКОМОТИВ
-БИЛЕТЫ
-КЛУБ
-КОМАНДЫ КЛУБА
-ИНФРАСТРУКТУРА
-АКАДЕМИЯ
-БОЛЕЛЬЩИКАМ
-На главную
-КАЛЕНДАРЬ ИГР
-КОМАНДЫ
-ОСНОВНОЙ СОСТАВ
-ЖФК «ЛОКОМОТИВ»
-МОЛОДЁЖКА-ЮНОШИ
-МОЛОДЁЖКА-ДЕВУШКИ
-2026/27
-ВСЕ ТУРНИРЫ
-ВСЕ МЕСЯЦЫ
-ВСЕ МАТЧИ
-ИЮНЬ
-2026
+NO FIXTURES FOUND
+https://r.jina.ai/https://www.fclm.ru/schedule/: parsed 0 fixtures, body=8582 chars
+https://r.jina.ai/http://www.fclm.ru/schedule/: parsed 0 fixtures, body=8519 chars
+--- RAW READER ---
+Title: Календарь игр
+
+URL Source: http://www.fclm.ru/schedule/
+
+Markdown Content:
 27.06
-17:00 СБ
+
+17:00 Сб
+
 Товарищеские матчи, BetBoom Сборы 2026. Первая игра
+
+![Image 1: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 0 : 0
+
+![Image 2: Родина](http://www.fclm.ru/upload/teams/0b7/rhmm2v8hbm9hy1ytza8a0drzz5h8db60.png)
+
 Родина
-МАТЧ-ЦЕНТР
-ИЮЛЬ
-2026
+
 03.07
-11:00 ПТ
+
+11:00 Пт
+
 Товарищеские матчи, BetBoom Сборы 2026. Вторая игра
+
+![Image 3: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 8 : 0
+
+![Image 4: Знамя Труда](http://www.fclm.ru/upload/teams/ec9/g7fa2i43j0d1r47szbyttw9jownzuesl.png)
+
 Знамя Труда
-МАТЧ-ЦЕНТР
+
 03.07
-17:00 ПТ
+
+17:00 Пт
+
 Товарищеские матчи, BetBoom Сборы 2026. Третья игра
+
+![Image 5: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 2 : 0
+
+![Image 6: Спартак Кострома](http://www.fclm.ru/upload/teams/9d2/dt0sfu5c38bw5rqn0v16q49w63colc8u.png)
+
 Спартак Кострома
-МАТЧ-ЦЕНТР
+
 11.07
-11:00 СБ
+
+11:00 Сб
+
 Товарищеские матчи, BetBoom Сборы 2026. Четвёртая игра
+
+![Image 7: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 3 : 0
+
+![Image 8: Акрон](http://www.fclm.ru/upload/teams/e53/02k53jxwk7bayo67hvb9esagpb02qbqd.png)
+
 Акрон
-МАТЧ-ЦЕНТР
+
 11.07
-20:00 СБ
+
+20:00 Сб
+
 Товарищеские матчи, BetBoom Сборы 2026. Пятая игра
+
+![Image 9: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 2 : 0
+
+![Image 10: Спартак](http://www.fclm.ru/upload/teams/282/h3d8zv9oht46q1fb9dtmdrdq47frjkwq.png)
+
 Спартак
-МАТЧ-ЦЕНТР
+
 14.07
-17:00 ВТ
+
+17:00 Вт
+
 Товарищеские матчи, BetBoom Сборы 2026. Шестая игра
+
+![Image 11: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 1 : 0
+
+![Image 12: ПФК ЦСКА](http://www.fclm.ru/upload/teams/2c6/ip67r9d5t1ajctvgur9tpoaa1y8at58i.png)
+
 ПФК ЦСКА
-МАТЧ-ЦЕНТР
+
 18.07
-11:00 СБ
+
+11:00 Сб
+
 Товарищеские матчи, BetBoom Сборы 2026. Седьмая игра
+
+![Image 13: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 1 : 3
+
+![Image 14: Рубин](http://www.fclm.ru/upload/teams/7b9/yxf5l92gqgds14lesztaeffayuxh4qif.png)
+
 Рубин
-МАТЧ-ЦЕНТР
+
 18.07
-17:00 СБ
+
+17:00 Сб
+
 Товарищеские матчи, BetBoom Сборы 2026. Восьмая игра
+
+![Image 15: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 3 : 1
+
+![Image 16: Рубин](http://www.fclm.ru/upload/teams/7b9/yxf5l92gqgds14lesztaeffayuxh4qif.png)
+
 Рубин
-МАТЧ-ЦЕНТР
+
 26.07
-17:00 ВС
+
+17:00 Вс
+
 Россия. Премьер-лига, Тур 1
+
+![Image 17: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 1 : 1
+
+![Image 18: Ахмат](http://www.fclm.ru/upload/teams/10b/kawgikgai6iqjep2iz1h3fhui7z4xbxs.png)
+
 Ахмат
-МАТЧ-ЦЕНТР
-АВГУСТ
-2026
+
 01.08
-18:30 СБ
+
+18:30 Сб
+
 Россия. Премьер-лига, Тур 2
+
+![Image 19: Динамо Мх](http://www.fclm.ru/upload/teams/c56/drx7e1xuw76t2hah7kvp3ixildxoei0k.png)
+
 Динамо Мх
+
 2 : 1
+
+![Image 20: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 04.08
-20:45 ВТ
+
+20:45 Вт
+
 Fonbet Кубок России, Тур 1
+
+![Image 21: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 1 : 1
+
+![Image 22: ПФК ЦСКА](http://www.fclm.ru/upload/teams/2c6/ip67r9d5t1ajctvgur9tpoaa1y8at58i.png)
+
 ПФК ЦСКА
-МАТЧ-ЦЕНТР
+
 08.08
-18:00 СБ
+
+18:00 Сб
+
 Россия. Премьер-лига, Тур 3
+
+![Image 23: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
+
 0 : 0
+
+![Image 24: Акрон](http://www.fclm.ru/upload/teams/e53/02k53jxwk7bayo67hvb9esagpb02qbqd.png)
+
 Акрон
-МАТЧ-ЦЕНТР
+
 14.08
-17:00 ПТ
+
+17:00 Пт
+
 Россия. Премьер-лига, Тур 4
+
+![Image 25: Оренбург](http://www.fclm.ru/upload/teams/cd5/dk5vqcuw8mn4x5uvoqyq328t039bpnwj.png)
+
 Оренбург
+
 1 : 1
+
+![Image 26: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 18.08
-20:45 ВТ
+
+20:45 Вт
+
 Fonbet Кубок России, Тур 2
+
+![Image 27: Ростов](http://www.fclm.ru/upload/teams/e35/vecg3ch9ceo87kbk70b916wxediqrbpt.png)
+
 Ростов
+
 1 : 0
+
+![Image 28: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 22.08
-20:15 СБ
+
+20:15 Сб
+
 Россия. Премьер-лига, Тур 5
+
+![Image 29: ПФК ЦСКА](http://www.fclm.ru/upload/teams/2c6/ip67r9d5t1ajctvgur9tpoaa1y8at58i.png)
+
 ПФК ЦСКА
+
 3 : 2
+
+![Image 30: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 29.08
-20:00 СБ
+
+20:00 Сб
+
 Россия. Премьер-лига, Тур 6
+
+![Image 31: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-VS
+
+vs
+
+![Image 32: Динамо Москва](http://www.fclm.ru/upload/teams/707/44hacrxr01v6cosf4dbr7ws92i786n00.png)
+
 Динамо Москва
-КУПИТЬ БИЛЕТЫ
-СЕНТЯБРЬ
-2026
+
 01.09
-16:15 ВТ
+
+16:15 Вт
+
 Fonbet Кубок России, Тур 3
+
+![Image 33: Акрон](http://www.fclm.ru/upload/teams/e53/02k53jxwk7bayo67hvb9esagpb02qbqd.png)
+
 Акрон
-VS
+
+vs
+
+![Image 34: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 06.09
-20:45 ВС
+
+20:45 Вс
+
 Россия. Премьер-лига, Тур 7
+
+![Image 35: Балтика](http://www.fclm.ru/upload/teams/cec/31mhf212b7cbm7lw4161cdw6vpbluh9k.png)
+
 Балтика
-VS
+
+vs
+
+![Image 36: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 12.09
-16:15 СБ
+
+16:15 Сб
+
 Россия. Премьер-лига, Тур 8
+
+![Image 37: Зенит](http://www.fclm.ru/upload/teams/c98/pa1di1hfx79aqwdeb1qldulgt81i4kt2.png)
+
 Зенит
-VS
+
+vs
+
+![Image 38: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 16.09
-20:45 СР
+
+20:45 Ср
+
 Россия. Премьер-лига, Тур 9
+
+![Image 39: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-VS
+
+vs
+
+![Image 40: Крылья Советов](http://www.fclm.ru/upload/teams/f2b/mea1mcosxninqtl0vejyn1fh8h213hy6.png)
+
 Крылья Советов
-КУПИТЬ БИЛЕТЫ
-ОКТЯБРЬ
-2026
+
 10.10
-15:15 СБ
+
+15:15 Сб
+
 Россия. Премьер-лига, Тур 10
+
+![Image 41: Факел](http://www.fclm.ru/upload/teams/7f8/qn5bhp5fetid78f3v0pbhz7rpwvqzdnb.png)
+
 Факел
-VS
+
+vs
+
+![Image 42: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 13.10
-18:30 ВТ
+
+18:30 Вт
+
 Fonbet Кубок России, Тур 4
+
+![Image 43: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-VS
+
+vs
+
+![Image 44: Акрон](http://www.fclm.ru/upload/teams/e53/02k53jxwk7bayo67hvb9esagpb02qbqd.png)
+
 Акрон
-МАТЧ-ЦЕНТР
+
 17.10
-19:30 СБ
+
+19:30 Сб
+
 Россия. Премьер-лига, Тур 11
+
+![Image 45: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-VS
+
+vs
+
+![Image 46: Краснодар](http://www.fclm.ru/upload/teams/be4/z8dn4r5ocq8soi7ndgjhces4d05zr0q9.png)
+
 Краснодар
-МАТЧ-ЦЕНТР
+
 25.10
-13:45 ВС
+
+13:45 Вс
+
 Россия. Премьер-лига, Тур 12
+
+![Image 47: Ростов](http://www.fclm.ru/upload/teams/e35/vecg3ch9ceo87kbk70b916wxediqrbpt.png)
+
 Ростов
-VS
+
+vs
+
+![Image 48: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 29.10
-19:30 ЧТ
+
+19:30 Чт
+
 Fonbet Кубок России, Тур 5
+
+![Image 49: ПФК ЦСКА](http://www.fclm.ru/upload/teams/2c6/ip67r9d5t1ajctvgur9tpoaa1y8at58i.png)
+
 ПФК ЦСКА
-VS
+
+vs
+
+![Image 50: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
-НОЯБРЬ
-2026
+
 01.11
-19:45 ВС
+
+19:45 Вс
+
 Россия. Премьер-лига, Тур 13
+
+![Image 51: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-VS
+
+vs
+
+![Image 52: Спартак](http://www.fclm.ru/upload/teams/212/a0naa93e4deprtfkopb2vojr8qivi5z5.png)
+
 Спартак
-МАТЧ-ЦЕНТР
+
 06.11
-19:30 ПТ
+
+19:30 Пт
+
 Россия. Премьер-лига, Тур 14
+
+![Image 53: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-VS
+
+vs
+
+![Image 54: Рубин](http://www.fclm.ru/upload/teams/7b9/yxf5l92gqgds14lesztaeffayuxh4qif.png)
+
 Рубин
-МАТЧ-ЦЕНТР
+
 22.11
-19:00 ВС
+
+19:00 Вс
+
 Россия. Премьер-лига, Тур 15
+
+![Image 55: Родина](http://www.fclm.ru/upload/teams/0b7/rhmm2v8hbm9hy1ytza8a0drzz5h8db60.png)
+
 Родина
-VS
+
+vs
+
+![Image 56: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
+
 25.11
-20:30 СР
+
+20:30 Ср
+
 Fonbet Кубок России, Тур 6
+
+![Image 57: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-VS
+
+vs
+
+![Image 58: Ростов](http://www.fclm.ru/upload/teams/e35/vecg3ch9ceo87kbk70b916wxediqrbpt.png)
+
 Ростов
-МАТЧ-ЦЕНТР
+
 29.11
-19:45 ВС
+
+19:45 Вс
+
 Россия. Премьер-лига, Тур 16
+
+![Image 59: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-VS
+
+vs
+
+![Image 60: Динамо Мх](http://www.fclm.ru/upload/teams/c56/drx7e1xuw76t2hah7kvp3ixildxoei0k.png)
+
 Динамо Мх
-МАТЧ-ЦЕНТР
-ДЕКАБРЬ
-2026
+
 05.12
-19:45 СБ
+
+19:45 Сб
+
 Россия. Премьер-лига, Тур 17
+
+![Image 61: Ахмат](http://www.fclm.ru/upload/teams/10b/kawgikgai6iqjep2iz1h3fhui7z4xbxs.png)
+
 Ахмат
-VS
+
+vs
+
+![Image 62: Локомотив](http://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
+
 Локомотив
-МАТЧ-ЦЕНТР
-РЕКЛАМА • RAILFGK.RU
-РЕКЛАМА • BETBOOM.RU
-РЕКЛАМА • FPC.RU
-РЕКЛАМА • SOVCOMBANK.RU
-РЕКЛАМА • ABINBEVEFES.RU
-РЕКЛАМА • SMARTTRAVEL.RU
-РЕКЛАМА • RFSOLOKOMOTIV.RU
-РЕКЛАМА • HTTPS://RZDLOG.RU/
-РЕКЛАМА • TRANSVOC.RU
-РЕКЛАМА • ITALSPORT.RU/
-РЕКЛАМА • MAXLER.RU
-РЕКЛАМА • SPORTS.RU
-РЕКЛАМА • KALINA-SM.RU
-РЕКЛАМА • SWM-AUTO.RU
-РЕКЛАМА • RZD-BONUS.RU
-РЕКЛАМА • TASSAY.RU
-РЕКЛАМА • TOPAZ24.RU
-Официальный сайт Футбольного клуба «Локомотив»
-Адрес:
-107553, Г. МОСКВА, УЛ. БОЛЬШАЯ ЧЕРКИЗОВСКАЯ, ВЛД. 125, СТР. 1
-Телефон:
-+7 (495) 500-3-100
-ФК ЛОКОМОТИВ
-Новости
-Календарь
-Турнирная таблица
-Игроки
-Тренерский штаб
-Медиа
-Фото
-Программа лояльности
-Положение о программе лояльности
-Противодействие коррупции
-Политика обработки персональных данных
-Работа в РЖД
-Информация для болельщиков МГН
-Правила пользования платной автоматизированной (неохраняемой) парковкой автотранспорта на территории стадиона «РЖД Арена»
-БИЛЕТЫ
-Расписание матчей
-ВИП-Ложи
-Оферта
-Вернуть билет
-МАГАЗИН
-Как выбрать товар
-Способы оплаты
-Доставка
-Гарантия, обмен и возврат
-Конфиденциальность
-Информация о продавце
-КЛУБ
-О Клубе
-ЖФК «Локомотив»
-Молодёжка-юноши
-Молодёжка-девушки
-ЮФЛ-1. ЮНОШИ
-ЮФЛ-2. ЮНОШИ
-ЮФЛ-3. ЮНОШИ
-ЮФЛ-1. ДЕВУШКИ
-ЮФЛ-2. ДЕВУШКИ
-ЮФЛ-3. ДЕВУШКИ
-Академия
-Политика обработки персональных данных Академии «Локомотив»
-Положение о турнире «Путь Будущего»
-Спонсоры
-История
-Банковская карта «Локомотив»
-Контакты
-© 1999-2026 FCLM.RU Футбольный клуб «Локомотив» Москва. При полном или частичном использовании материалов ссылка на официальный сайт ФК «Локомотив» обязательна.
+
