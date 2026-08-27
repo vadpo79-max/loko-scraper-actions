@@ -30,10 +30,22 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-    
+      - name: Save previous fixtures
+        run: cp fixtures.json fixtures.previous.json
 
       - name: Run scraper
         run: npm start
+
+      - name: Protect against empty result
+        run: |
+          COUNT=$(node -e "const f=require('./fixtures.json'); console.log(Array.isArray(f.fixtures) ? f.fixtures.length : 0)")
+          echo "Scraper produced $COUNT fixtures"
+          if [ "$COUNT" -eq 0 ]; then
+            echo "WARNING: scraper returned 0 fixtures; restoring previous fixtures.json"
+            mv fixtures.previous.json fixtures.json
+          else
+            rm -f fixtures.previous.json
+          fi
 
       - name: Commit fixtures.json and diagnostics
         run: |
