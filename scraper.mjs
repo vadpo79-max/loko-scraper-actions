@@ -30,7 +30,7 @@ function cleanLine(raw) {
 }
 const isDate=s=>/^\d{1,2}\.\d{1,2}$/.test(s);
 const isYear=s=>/^20\d{2}$/.test(s);
-const isTime=s=>/^\d{1,2}:\d{2}(?:\s+[А-ЯA-Za-z]{2,3})?$/.test(s);
+const isTime=s=>/^\d{1,2}:\d{2}(?:\s+[А-Яа-яЁёA-Za-z]{2,3})?$/.test(s);
 const isCompetition=s=>/(премьер-лига|кубок|rpl|russian cup|фонбет|fonbet|товарищ|friendlies|тур\s*\d+|day\s*\d+)/i.test(s);
 const isNoise=s=>/^(матч-центр|match center|купить билеты|билеты|tickets|календарь игр|loko calendar)$/i.test(s)||/^https?:\/\//i.test(s)||/^\[.*\]:/.test(s);
 function isTeamName(s){
