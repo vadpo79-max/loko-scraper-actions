@@ -1,5 +1,5 @@
 USED: https://r.jina.ai/https://www.fclm.ru/schedule/
-FOUND: 14
+FOUND: 13
 ---
 Title: Календарь игр
 
@@ -288,7 +288,7 @@ Fonbet Кубок России, Тур 3
 
 Балтика
 
-vs
+0 : 1
 
 ![Image 36: Локомотив](https://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
 

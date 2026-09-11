@@ -1,17 +1,8 @@
 {
-  "generatedAt": "2026-09-04T10:15:40.075Z",
+  "generatedAt": "2026-09-11T10:19:03.127Z",
   "source": "https://r.jina.ai/https://www.fclm.ru/schedule/",
-  "count": 14,
+  "count": 13,
   "fixtures": [
-    {
-      "title": "Балтика — Локомотив",
-      "isHome": false,
-      "startISO": "2026-09-06T17:45:00.000Z",
-      "endISO": "2026-09-06T19:45:00.000Z",
-      "location": "",
-      "competition": "Россия. Премьер-лига",
-      "round": "Тур 7"
-    },
     {
       "title": "Зенит — Локомотив",
       "isHome": false,
