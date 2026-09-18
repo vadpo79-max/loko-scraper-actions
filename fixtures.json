@@ -1,26 +1,8 @@
 {
-  "generatedAt": "2026-09-11T10:19:03.127Z",
+  "generatedAt": "2026-09-18T10:18:47.790Z",
   "source": "https://r.jina.ai/https://www.fclm.ru/schedule/",
-  "count": 13,
+  "count": 11,
   "fixtures": [
-    {
-      "title": "Зенит — Локомотив",
-      "isHome": false,
-      "startISO": "2026-09-12T13:15:00.000Z",
-      "endISO": "2026-09-12T15:15:00.000Z",
-      "location": "",
-      "competition": "Россия. Премьер-лига",
-      "round": "Тур 8"
-    },
-    {
-      "title": "Локомотив — Крылья Советов",
-      "isHome": true,
-      "startISO": "2026-09-16T17:45:00.000Z",
-      "endISO": "2026-09-16T19:45:00.000Z",
-      "location": "РЖД Арена, Москва",
-      "competition": "Россия. Премьер-лига",
-      "round": "Тур 9"
-    },
     {
       "title": "Факел — Локомотив",
       "isHome": false,

@@ -1,5 +1,5 @@
 USED: https://r.jina.ai/https://www.fclm.ru/schedule/
-FOUND: 13
+FOUND: 11
 ---
 Title: Календарь игр
 
@@ -304,7 +304,7 @@ Fonbet Кубок России, Тур 3
 
 Зенит
 
-vs
+2 : 1
 
 ![Image 38: Локомотив](https://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
 
@@ -320,7 +320,7 @@ vs
 
 Локомотив
 
-vs
+1 : 1
 
 ![Image 40: Крылья Советов](https://www.fclm.ru/upload/teams/f2b/mea1mcosxninqtl0vejyn1fh8h213hy6.png)
 
