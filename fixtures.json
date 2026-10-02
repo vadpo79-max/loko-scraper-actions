@@ -1,17 +1,8 @@
 {
-  "generatedAt": "2026-09-25T10:53:29.031Z",
+  "generatedAt": "2026-10-02T11:39:01.407Z",
   "source": "https://r.jina.ai/https://www.fclm.ru/schedule/",
-  "count": 13,
+  "count": 12,
   "fixtures": [
-    {
-      "title": "Локомотив — Арсенал",
-      "isHome": true,
-      "startISO": "2026-09-26T13:00:00.000Z",
-      "endISO": "2026-09-26T15:00:00.000Z",
-      "location": "РЖД Арена, Москва",
-      "competition": "Товарищеские матчи, Баковка. Сентябрь",
-      "round": ""
-    },
     {
       "title": "Локомотив — Оренбург",
       "isHome": true,
