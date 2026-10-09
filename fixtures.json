@@ -1,17 +1,8 @@
 {
-  "generatedAt": "2026-10-02T11:39:01.407Z",
+  "generatedAt": "2026-10-09T12:20:50.923Z",
   "source": "https://r.jina.ai/https://www.fclm.ru/schedule/",
-  "count": 12,
+  "count": 11,
   "fixtures": [
-    {
-      "title": "Локомотив — Оренбург",
-      "isHome": true,
-      "startISO": "2026-10-03T08:30:00.000Z",
-      "endISO": "2026-10-03T10:30:00.000Z",
-      "location": "РЖД Арена, Москва",
-      "competition": "Товарищеские матчи, Баковка. Октябрь",
-      "round": ""
-    },
     {
       "title": "Факел — Локомотив",
       "isHome": false,

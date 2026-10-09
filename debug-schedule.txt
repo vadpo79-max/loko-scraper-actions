@@ -1,5 +1,5 @@
 USED: https://r.jina.ai/https://www.fclm.ru/schedule/
-FOUND: 12
+FOUND: 11
 ---
 Title: Календарь игр
 
@@ -352,7 +352,7 @@ Fonbet Кубок России, Тур 3
 
 Локомотив
 
-vs
+2 : 0
 
 ![Image 44: Оренбург](https://www.fclm.ru/upload/teams/cd5/dk5vqcuw8mn4x5uvoqyq328t039bpnwj.png)
 
