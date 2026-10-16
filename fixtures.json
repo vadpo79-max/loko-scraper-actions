@@ -1,26 +1,8 @@
 {
-  "generatedAt": "2026-10-09T12:20:50.923Z",
+  "generatedAt": "2026-10-16T10:23:59.869Z",
   "source": "https://r.jina.ai/https://www.fclm.ru/schedule/",
-  "count": 11,
+  "count": 9,
   "fixtures": [
-    {
-      "title": "Факел — Локомотив",
-      "isHome": false,
-      "startISO": "2026-10-10T12:15:00.000Z",
-      "endISO": "2026-10-10T14:15:00.000Z",
-      "location": "",
-      "competition": "Альфа-Банк РПЛ",
-      "round": "Тур 10"
-    },
-    {
-      "title": "Локомотив — Акрон",
-      "isHome": true,
-      "startISO": "2026-10-13T15:30:00.000Z",
-      "endISO": "2026-10-13T17:30:00.000Z",
-      "location": "РЖД Арена, Москва",
-      "competition": "Fonbet Кубок России",
-      "round": "Тур 4"
-    },
     {
       "title": "Локомотив — Краснодар",
       "isHome": true,

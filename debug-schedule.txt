@@ -1,5 +1,5 @@
 USED: https://r.jina.ai/https://www.fclm.ru/schedule/
-FOUND: 11
+FOUND: 9
 ---
 Title: Календарь игр
 
@@ -368,7 +368,7 @@ Fonbet Кубок России, Тур 3
 
 Факел
 
-vs
+0 : 5
 
 ![Image 46: Локомотив](https://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
 
@@ -384,7 +384,7 @@ Fonbet Кубок России, Тур 4
 
 Локомотив
 
-vs
+1 : 1
 
 ![Image 48: Акрон](https://www.fclm.ru/upload/teams/e53/02k53jxwk7bayo67hvb9esagpb02qbqd.png)
 
