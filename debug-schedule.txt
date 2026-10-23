@@ -1,5 +1,5 @@
 USED: https://r.jina.ai/https://www.fclm.ru/schedule/
-FOUND: 9
+FOUND: 8
 ---
 Title: Календарь игр
 
@@ -400,7 +400,7 @@ Fonbet Кубок России, Тур 4
 
 Локомотив
 
-vs
+3 : 3
 
 ![Image 50: Краснодар](https://www.fclm.ru/upload/teams/be4/z8dn4r5ocq8soi7ndgjhces4d05zr0q9.png)
 
