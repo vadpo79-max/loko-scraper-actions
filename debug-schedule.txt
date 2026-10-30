@@ -1,5 +1,5 @@
 USED: https://r.jina.ai/https://www.fclm.ru/schedule/
-FOUND: 8
+FOUND: 6
 ---
 Title: Календарь игр
 
@@ -416,7 +416,7 @@ Fonbet Кубок России, Тур 4
 
 Ростов
 
-vs
+2 : 0
 
 ![Image 52: Локомотив](https://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
 
@@ -432,7 +432,7 @@ Fonbet Кубок России, Тур 5
 
 ПФК ЦСКА
 
-vs
+3 : 1
 
 ![Image 54: Локомотив](https://www.fclm.ru/upload/teams/5fb/namz3ztp1dpczmwvoi8g913u2k0qaoby.png)
 

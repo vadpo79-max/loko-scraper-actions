@@ -1,26 +1,8 @@
 {
-  "generatedAt": "2026-10-23T10:46:18.871Z",
+  "generatedAt": "2026-10-30T11:54:56.959Z",
   "source": "https://r.jina.ai/https://www.fclm.ru/schedule/",
-  "count": 8,
+  "count": 6,
   "fixtures": [
-    {
-      "title": "Ростов — Локомотив",
-      "isHome": false,
-      "startISO": "2026-10-25T10:45:00.000Z",
-      "endISO": "2026-10-25T12:45:00.000Z",
-      "location": "",
-      "competition": "Альфа-Банк РПЛ",
-      "round": "Тур 12"
-    },
-    {
-      "title": "ПФК ЦСКА — Локомотив",
-      "isHome": false,
-      "startISO": "2026-10-29T16:30:00.000Z",
-      "endISO": "2026-10-29T18:30:00.000Z",
-      "location": "",
-      "competition": "Fonbet Кубок России",
-      "round": "Тур 5"
-    },
     {
       "title": "Локомотив — Спартак",
       "isHome": true,
