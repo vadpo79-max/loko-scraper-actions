@@ -1,5 +1,5 @@
 USED: https://r.jina.ai/https://www.fclm.ru/schedule/
-FOUND: 6
+FOUND: 5
 ---
 Title: Календарь игр
 
@@ -448,9 +448,9 @@ Fonbet Кубок России, Тур 5
 
 Локомотив
 
-vs
+0 : 4
 
-![Image 56: Спартак](https://www.fclm.ru/upload/teams/212/a0naa93e4deprtfkopb2vojr8qivi5z5.png)
+![Image 56: Спартак](https://www.fclm.ru/upload/teams/282/h3d8zv9oht46q1fb9dtmdrdq47frjkwq.png)
 
 Спартак
 
