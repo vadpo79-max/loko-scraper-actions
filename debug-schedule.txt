@@ -1,5 +1,5 @@
 USED: https://r.jina.ai/https://www.fclm.ru/schedule/
-FOUND: 5
+FOUND: 4
 ---
 Title: Календарь игр
 
@@ -464,7 +464,7 @@ Fonbet Кубок России, Тур 5
 
 Локомотив
 
-vs
+0 : 1
 
 ![Image 58: Рубин](https://www.fclm.ru/upload/teams/7b9/yxf5l92gqgds14lesztaeffayuxh4qif.png)
 
